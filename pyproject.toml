@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "ems"
+version = "0.0.0"
+description = "The description of the package"
+
+classifiers = [
+  "Operating System :: OS Independent",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering",
+]
+
+license = "MIT"
+
+authors = [
+    "Philip Chmielowiec <philipc2@uchicago.edu>",
+]
+
+repository = "https://github.com/Human-Computer-Integration-Lab/ems"
+# homepage = ...
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9"
