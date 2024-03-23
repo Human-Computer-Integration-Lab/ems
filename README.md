@@ -4,8 +4,8 @@
 </h1><br>
 
 [comment]: <> (REPLACE THIS ONCE PACKAGE IS RELACED TO PyPi and CONDA)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/numpy.svg?label=PyPI%20downloads)](
-https://pypi.org/project/numpy/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/ems.svg?label=PyPI%20downloads)](
+https://pypi.org/project/ems/)
 [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/numpy.svg?label=Conda%20downloads)](
 https://anaconda.org/conda-forge/numpy)
 
