@@ -45,7 +45,7 @@ class Rehastim:
         self.ser = serial_device
         
         # Start listening on the serial port
-        self.listen = threading.Thread(target=self.decode_response)
+        self.listen = threading.Thread(target=self.__decode_response)
         self.listen.start()
 
     # A constructor for the class which uses a port
@@ -98,7 +98,7 @@ class Rehastim:
     # This can be implemented as just a print statement. 
     # However, it could also be extended to provide exceptions, 
     # e.g. if the device returns data that is an error
-    def decode_response(self):
+    def __decode_response(self):
         print("Started a listening SerialThread on " + str(self.ser))
         while True:
             v = self.ser.read(size=1)
