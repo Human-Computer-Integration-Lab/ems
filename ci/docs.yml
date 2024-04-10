@@ -2,4 +2,5 @@ name: ems-docs
 channels:
     - conda-forge
 dependencies:
-    - python
+    - sphinx
+    - sphinx-rtd-theme

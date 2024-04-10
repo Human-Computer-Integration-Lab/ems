@@ -5,11 +5,13 @@
 # Required
 version: 2
 
-# Set the OS, Python version and other tools you might need
 build:
-  os: ubuntu-22.04
+  os: "ubuntu-20.04"
   tools:
-    python: "3.11"
+    python: "mambaforge-4.10"
+  jobs:
+    post_create_environment:
+      - pip install . --no-deps -vv
 
 conda:
   environment: ci/docs.yml
