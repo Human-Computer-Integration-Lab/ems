@@ -3,4 +3,4 @@ channels:
     - conda-forge
 dependencies:
     - sphinx
-    - sphinx-rtd-theme
+    - sphinx-book-theme
