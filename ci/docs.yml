@@ -1,0 +1,6 @@
+name: ems-docs
+channels:
+    - conda-forge
+dependencies:
+    - sphinx
+    - sphinx-book-theme
