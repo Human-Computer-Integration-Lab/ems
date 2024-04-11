@@ -4,8 +4,3 @@ class Device:
 
     def __getitem__(self, channel):
         pass
-
-
-class Channel:
-    def __init__(self):
-        pass
