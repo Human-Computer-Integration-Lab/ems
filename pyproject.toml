@@ -26,3 +26,4 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9"
+pyserial = "^3.5"
