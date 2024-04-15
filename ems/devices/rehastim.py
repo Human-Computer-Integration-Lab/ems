@@ -13,6 +13,10 @@ class Rehastim(Device):
     min_channel: int = 0
     max_channel: int = 7
 
+    def __repr__(self):
+        # used to display device-specific information (name, make, model, battery, etc.)
+        pass
+
     @classmethod
     def from_port(cls, port, **kwargs):
         serial_device = serial.Serial(

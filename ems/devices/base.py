@@ -20,6 +20,16 @@ class Device:
     def from_serial_device(cls, device):
         return cls(device)
 
+    def stimulate(self, *args, **kwargs):
+        # TODO: each device MUST have a stimulate method
+        pass
+
+    def validate(self, channel, intensity, pulse_width):
+        """Validates a possible configuration against the device specifications."""
+        self._validate_channel(channel)
+        self._validate_intensity(intensity)
+        self._validate_pulse_width(pulse_width)
+
     def _validate_intensity(self, intensity):
         """Checks if a provided intensity value is within the device specifications."""
         if intensity < self.min_intensity or intensity > self.max_intensity:

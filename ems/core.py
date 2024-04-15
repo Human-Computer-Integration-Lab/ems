@@ -1,4 +1,4 @@
-from .devices import Device
+from .devices import Device, supported_devices
 
 
 class EMS:
@@ -6,29 +6,55 @@ class EMS:
         """"""
         self.device = stimulator_handle
 
-        # a dictionary of channel ids to channel instances (ADD TYPING)
-        self.calibration = {}
+        self.calibration: dict[int, Channel] = {}
 
     def __repr__(self):
         pass
 
     @classmethod
     def autodetect(cls):
+        # should be able to:
+        # 1: detect what type of device is being connected and whether it is supported
+        # 2. establish a connection
         pass
 
     @classmethod
-    def from_port(cls):
-        pass
+    def from_port(cls, port, device_spec: str):
+        if device_spec not in supported_devices:
+            raise ValueError(
+                f"TODO: {device_spec} is not a supported device. Expected one of {supported_devices.keys()}"
+            )
+
+        device_obj = supported_devices[device_spec]
+
+        if not hasattr(device_obj, "from_port"):
+            raise ValueError(
+                f"TODO: {device_spec} does not support initialization from a serial port ... "
+            )
+
+        return cls(device_obj.from_port(port))
 
     @classmethod
-    def from_serial_device(cls):
-        pass
+    def from_serial_device(cls, device, device_spec: str):
+        if device_spec not in supported_devices:
+            raise ValueError(
+                f"TODO: {device_spec} is not a supported device. Expected one of {supported_devices.keys()}"
+            )
+
+        device_obj = supported_devices[device_spec]
+
+        if not hasattr(device_obj, "from_serial_device"):
+            raise ValueError(
+                f"TODO: {device_spec} does not support initialization from a serial device ... "
+            )
+
+        return cls(device_obj.from_serial_device(device))
 
     def calibrate(
         self,
         channel: int,
-        intensity: int = None,
-        pulse_width: int = None,
+        intensity: int | list[int] = None,
+        pulse_width: int | list[int] = None,
         pulse_count: int = 1,
         stimulate: bool = True,
     ):
@@ -55,10 +81,14 @@ class EMS:
 
     def load_calibration_file(self, file_path):
         # TODO
+        # 1. read calibration file (i.e. json)
+        # 2. repeated calls to calibrate with stimulate=False
         pass
 
     def save_calibration_file(self, file_path):
         # TODO
+        # 1. for each channel in self.calibration, convert to JSON
+        # 2. store as a single JSON
         pass
 
     def stimulate(
@@ -105,11 +135,20 @@ class Channel:
     def __init__(
         self,
         identifier: int,
-        intensity: int,
-        pulse_width: int,
+        intensity: int | list[int],
+        pulse_width: int | list[int],
         pulse_count: int,
         device: Device,
     ):
+        """TODO:
+
+        Support a custom waveform with a list of intensities and pulse widths ??
+        """
+        self._device = device
+
+        # validate channel specifications to ensure they adhere to the device specifications
+        self._device.validate(identifier, intensity, pulse_width)
+
         self._identifier = identifier
         self._intensity = intensity
         self._pulse_width = pulse_width
@@ -126,6 +165,7 @@ class Channel:
 
     @intensity.setter
     def intensity(self, intensity):
+        """Sets the intensity, with validations to ensure the provided intensity is within the device specifications."""
         self._device._validate_intensity(intensity)
         self._intensity = intensity
 
@@ -136,17 +176,17 @@ class Channel:
 
     @pulse_width.setter
     def pulse_width(self, pulse_width):
+        """Sets the pulse_width, with validations to ensure the provided pulse_width is within the device specifications."""
         self._device._validate_pulse_width(pulse_width)
         self._pulse_width = pulse_width
 
     @property
     def pulse_count(self):
-        """The number of stimulation pulses to generate?"""
+        """The number of stimulation pulses to generate ?"""
         return self._pulse_count
 
     @pulse_count.setter
     def pulse_count(self, pulse_count):
-        self._device._validate_pulse_count(pulse_count)
         self._pulse_count = pulse_count
 
     def to_json(self):
