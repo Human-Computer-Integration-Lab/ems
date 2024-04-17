@@ -1,3 +1,3 @@
-from .rehastim import Rehastim
+from .rehastim.rehastim import Rehastim
 
 supported_devices = {"rehastim": Rehastim}
