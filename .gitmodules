@@ -1,0 +1,3 @@
+[submodule "ems/devices/rehamove/rehamove-integration-lib"]
+	path = ems/devices/rehamove/rehamove-integration-lib
+	url = git@github.com:humancomputerintegration/rehamove-integration-lib.git
