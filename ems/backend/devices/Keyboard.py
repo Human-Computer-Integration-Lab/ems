@@ -1,16 +1,18 @@
 import threading
 
+
 class KeyboardListener(threading.Thread):
     def __init__(self, process_input):
         super().__init__()
         self.process_input = process_input
-    
+
     def run(self):
         while True:
             key = input("Enter something (press 'q' to quit): ")
             self.process_input("You entered: " + key)
-            if key.lower() == 'q':
+            if key.lower() == "q":
                 break
+
 
 # # Method to process the input
 # def process_input(message):
