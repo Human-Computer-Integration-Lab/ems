@@ -1,40 +1,44 @@
 
+.. module:: ems
 
 *****************
-EMS Documentation
+EMS documentation
 *****************
+
+**Date**: |today| **Version**: |version|
 
 EMS is an open-source electrical muscle stimulation toolkit.
-
-
 
 .. grid:: 1 1 2 2
     :gutter: 2 3 4 4
 
     .. grid-item-card::
         :text-align: center
+        :img-top: ../source/_static/index-images/getting_started.svg
 
-        Getting started
+        Getting Started Guide
         ^^^
 
-        TODO Description
+        The getting started guide provides an introduction to EMS' main concepts.
 
         +++
 
-        .. button-ref:: getting-started
+        .. button-ref:: quick-start
             :expand:
             :color: secondary
             :click-parent:
 
-            To the absolute beginner's guide
+            To the getting started guide
 
     .. grid-item-card::
         :text-align: center
+        :img-top: ../source/_static/index-images/user_guide.svg
 
-        User guide
+        User Guide
         ^^^
 
-        TODO Description
+        The user guide provides in-depth information on the key concepts of EMS with
+        usefully background information and explanations.
 
         +++
 
@@ -47,11 +51,14 @@ EMS is an open-source electrical muscle stimulation toolkit.
 
     .. grid-item-card::
         :text-align: center
+        :img-top: ../source/_static/index-images/api.svg
 
-        API reference
+        API Reference
         ^^^
 
-        TODO Description
+        The reference guide contains a detailed description of the functions, modules,
+        and objects included in EMS. It describes how the methods work and which parameters
+        can be used
 
         +++
 
@@ -64,11 +71,13 @@ EMS is an open-source electrical muscle stimulation toolkit.
 
     .. grid-item-card::
         :text-align: center
+        :img-top: ../source/_static/index-images/contributor.svg
 
-        Contributor's guide
+        Contributor's Guide
         ^^^
 
-        TODO Description
+        Want to contribute to EMS? The contributor's guide will guide you through the
+        process of contributing to EMS.
 
         +++
 
@@ -78,3 +87,12 @@ EMS is an open-source electrical muscle stimulation toolkit.
             :click-parent:
 
             To the contributor's guide
+
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   user-guide/index
+   api
+

@@ -14,7 +14,7 @@ release = "0.0"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = ["sphinx_design"]
 
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -24,4 +24,15 @@ exclude_patterns = []
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "pydata_sphinx_theme"
+
+html_theme_options = {
+    "logo": {
+        "image_light": "_static/logo.png",
+        "image_dark": "_static/logo.png",
+    },
+    "github_url": "https://github.com/Human-Computer-Integration-Lab/ems",
+    "collapse_navigation": True,
+}
+
 html_static_path = ["_static"]
+html_css_files = ["ems.css"]

@@ -1,2 +1,4 @@
-TODO
-====
+Contributor's Guide
+===================
+
+Todo
