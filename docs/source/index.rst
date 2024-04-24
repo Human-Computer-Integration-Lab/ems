@@ -97,13 +97,6 @@ EMS is an open-source Python package for device agnostic electrical muscle stimu
    User Guide <user-guide/index>
    API Reference <api>
 
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-   :caption: Community
-
-   GitHub discussions <https://github.com/pydata/xarray/discussions>
-   StackOverflow <https://stackoverflow.com/questions/tagged/python-xarray>
 
 
 
