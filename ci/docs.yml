@@ -4,3 +4,4 @@ channels:
 dependencies:
     - sphinx
     - pydata-sphinx-theme
+    - sphinx_design
