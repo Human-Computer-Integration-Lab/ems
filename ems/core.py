@@ -60,6 +60,11 @@ class EMS:
     ):
         """Calibrates a specified channel for stimulation."""
 
+        raise NotImplementedError
+
+    def set_pulse(
+        self, channel: int, intensity: int, pulse_width: int, pulse_count: int = 1
+    ):
         if channel not in self.calibration:
             # initialize and store a channel
             self.calibration[channel] = Channel(
@@ -74,10 +79,6 @@ class EMS:
             self.calibration[channel].intensity = intensity
             self.calibration[channel].pulse_width = pulse_width
             self.calibration[channel].pulse_count = pulse_count
-
-        if stimulate:
-            # stimulate the pulse for calibration
-            self.stimulate(channel, intensity, pulse_width, pulse_count)
 
     def load_calibration_file(self, file_path):
         # TODO
