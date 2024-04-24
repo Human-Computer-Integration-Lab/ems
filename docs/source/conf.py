@@ -6,6 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+
 project = "ems"
 copyright = "2024, University of Chicago Human Computer Integration Lab"
 author = "University of Chicago Human Computer Integration Lab"
@@ -14,7 +15,13 @@ release = "0.0"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx_design"]
+extensions = [
+    "sphinx_design",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+]
+
+autosummary_generate = True
 
 templates_path = ["_templates"]
 exclude_patterns = []
