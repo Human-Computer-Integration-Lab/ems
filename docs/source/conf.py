@@ -38,7 +38,6 @@ html_theme_options = {
         "image_dark": "_static/logo.png",
     },
     "github_url": "https://github.com/Human-Computer-Integration-Lab/ems",
-    "collapse_navigation": True,
 }
 
 html_static_path = ["_static"]

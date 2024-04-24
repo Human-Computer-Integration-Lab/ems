@@ -1,4 +1,3 @@
-
 .. module:: ems
 
 *****************
@@ -7,7 +6,7 @@ EMS documentation
 
 **Date**: |today| **Version**: |version|
 
-EMS is an open-source electrical muscle stimulation toolkit.
+EMS is an open-source Python package for device agnostic electrical muscle stimulation.
 
 .. grid:: 1 1 2 2
     :gutter: 2 3 4 4
@@ -81,7 +80,7 @@ EMS is an open-source electrical muscle stimulation toolkit.
 
         +++
 
-        .. button-ref:: contributors-guide.rst
+        .. button-ref:: contributors-guide
             :expand:
             :color: secondary
             :click-parent:
@@ -90,9 +89,22 @@ EMS is an open-source electrical muscle stimulation toolkit.
 
 
 .. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: For users
+
+   Getting Started <quick-start>
+   User Guide <user-guide/index>
+   API Reference <api>
+
+.. toctree::
    :maxdepth: 1
    :hidden:
+   :caption: Community
 
-   user-guide/index
-   api
+   GitHub discussions <https://github.com/pydata/xarray/discussions>
+   StackOverflow <https://stackoverflow.com/questions/tagged/python-xarray>
+
+
+
 
