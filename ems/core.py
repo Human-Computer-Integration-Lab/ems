@@ -2,8 +2,21 @@ from .devices import Device, supported_devices
 
 
 class EMS:
+    """A device-agnostic interface for performing Electrical Muscle Stimulation.
+
+    Parameters
+    ----------
+    stimulator_handle: Device
+        Reference to the hardware device that will be used for stimulation
+
+     See Also
+    --------
+    EMS.from_port
+    EMS.from_serial_device
+
+    """
+
     def __init__(self, stimulator_handle: Device):
-        """"""
         self.device = stimulator_handle
 
         self.calibration: dict[int, Channel] = {}

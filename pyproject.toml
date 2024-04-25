@@ -34,3 +34,6 @@ packages = ["ems"]
 
 [tool.setuptools_scm]
 fallback_version = "9999"
+
+[tool.ruff.lint]
+ignore = ['E731']
