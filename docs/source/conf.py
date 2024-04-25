@@ -6,6 +6,11 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import ems
+
+__all__ = [
+    "ems",
+]
 
 project = "ems"
 copyright = "2024, University of Chicago Human Computer Integration Lab"
