@@ -49,5 +49,8 @@ Channel
 .. autosummary::
    :toctree: generated/
 
-   ems.core.Channel
+   Channel
+   Channel.intensity
+   Channel.pulse_width
+
 
