@@ -53,4 +53,12 @@ Channel
    Channel.intensity
    Channel.pulse_width
 
+Device
+======
+.. autosummary::
+   :toctree: generated/
+
+   Device
+
+
 
