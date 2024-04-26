@@ -30,6 +30,7 @@ Stimulation
    :toctree: generated/
 
    EMS.stimulate
+   EMS.pulsed_stimulate
    EMS.delayed_stimulate
    EMS.timed_stimulate
 

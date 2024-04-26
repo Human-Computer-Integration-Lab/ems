@@ -1,5 +1,6 @@
 from .core import EMS
 
-__all__ = [
-    "EMS",
-]
+from .devices import Device
+
+
+__all__ = ["EMS", "Device"]

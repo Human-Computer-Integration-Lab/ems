@@ -18,10 +18,6 @@ class Rehastim(Device):
     # Channels 8 (2 times 4 on two modules)
     n_channels = 8
 
-    def __repr__(self):
-        # used to display device-specific information (name, make, model, battery, etc.)
-        pass
-
     @classmethod
     def from_port(cls, port, **kwargs):
         serial_device = serial.Serial(
@@ -37,16 +33,7 @@ class Rehastim(Device):
         )
         return cls(serial_device)
 
-    # A constructor which takes in a pre-made serial device
-    def from_serial_device(cls, dev):
-        return cls(dev)
-
-    # No longer allow intensity, pulse width to be None
-    # This is because calibration data is not stored in this object
-    # but is stored in the handler object
-    # so it doesn't make sense to fall back on it here - the fall back
-    # should occur upstream
-    def stim(
+    def stimulate(
         self,
         channel: int,
         intensity: int,
@@ -55,7 +42,7 @@ class Rehastim(Device):
         validate_params: bool = True,
     ):
         if validate_params:
-            self.validate()
+            self.validate(channel, intensity, pulse_width)
 
         # Verify
         def stimInThread() -> None:
@@ -64,17 +51,18 @@ class Rehastim(Device):
                 #     continue
                 # Generate a single pulse
                 # pulse = [self.calibration[channel][0], self.calibration[channel][1], int(self.calibration[channel][2])] # ch, pw, mA
-                pulse = [channel, pulse_width, intensity]  # ch, pw, mA
-                self.ser.write(self.__generate_pulse(*pulse))
+                self.ser.write(self._generate_pulse(channel, pulse_width, intensity))
                 time.sleep(self.delay)
 
-        self.__runInThread(stimInThread)
+        self._runInThread(stimInThread)
 
-    # A method to decode the responses received over the serial port.
-    # This can be implemented as just a print statement.
-    # However, it could also be extended to provide exceptions,
-    # e.g. if the device returns data that is an error
-    def __decode_response(self):
+    def _stimulate_in_thread(self, channel, intensity, pulse_width, pulse_count):
+        for _ in range(pulse_count):
+            self.ser.write(self._generate_pulse(channel, pulse_width, intensity))
+            time.sleep(self.delay)
+
+    def _decode_response(self):
+        """Decodes responses received over the serial port"""
         print("Started a listening SerialThread on " + str(self.ser))
         while True:
             v = self.ser.read(size=1)
@@ -84,28 +72,12 @@ class Rehastim(Device):
                 bitstring_v = bin(int.from_bytes(v, byteorder="big"))[2:]
                 print(bitstring_v)
 
-    def __generate_pulse(
+    def _generate_pulse(
         self, channel_number: int, pulse_width: int, pulse_current: int
     ):
-        # global safety_limit
         ident = 3
-        # channel_number = _channel_number-1
-        # pulse_width = _pulse_width
-        # if (_pulse_current < safety_limit):
-        #     pulse_current = _pulse_current
-        # else:
-        #     print("SAFETY LIMIT (of " + str(safety_limit) + " EXCEEDED. Request of " + str(_pulse_current) + "dropped to limit")
-        #     pulse_current = safety_limit
         checksum = (channel_number + pulse_width + pulse_current) % 32
-        # print("checksum verify = " + str(checksum))
 
-        # print("binary command: \n" +
-        # "\t" + get_bin(ident,2) +  "\t\t#ident\t\t"+ str(len(get_bin(ident,2))) + "\n" +
-        # "\t" + get_bin(checksum, 5) + "\t\t#checksum\t" + str(len(get_bin(checksum, 5))) + "\n" +
-        # "\t" + get_bin(channel_number,3) + "\t\t#channel_number\t" + str(len(get_bin(channel_number,3))) + "\n" +
-        # "\t" + get_bin(pulse_width,9) + "\t#pulse_width\t" + str(len(get_bin(pulse_width,9))) + "\n" +
-        # "\t" + get_bin(pulse_current,7) + "\t\t#pulse_current\t" + str(len(get_bin(pulse_current,7))) + "\n"
-        # )
         get_bin = (
             lambda x, n: x >= 0
             and str(bin(x))[2:].zfill(n)
@@ -147,7 +119,7 @@ class Rehastim(Device):
         print(hex(int(proper_bin_command, 2)))
         return binascii.unhexlify(hex_command)
 
-    def __runInThread(self, f):
+    def _run_in_thread(self, f):
         # Create a new thread if currently in the main thread, call f() in this thread otherwise
         if isinstance(threading.current_thread(), threading._MainThread):
             newThread = threading.Thread(target=f)
