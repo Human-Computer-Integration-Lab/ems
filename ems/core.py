@@ -1,6 +1,8 @@
 from .devices import Device, supported_devices
+from .calibration import CalibrationWidget
 
 import time
+from IPython.display import display
 
 
 class EMS:
@@ -85,15 +87,10 @@ class EMS:
 
     def calibrate(
         self,
-        channel: int,
-        intensity: int | list[int] = None,
-        pulse_width: int | list[int] = None,
-        pulse_count: int = 1,
-        stimulate: bool = True,
     ):
         """Calibrates a specified channel for stimulation."""
-
-        raise NotImplementedError
+        calibration_widget = CalibrationWidget(self)
+        display(calibration_widget.widget)
 
     def set_pulse(self, channel: int, intensity: int, pulse_width: int):
         if channel not in self.calibration:
@@ -156,7 +153,9 @@ class EMS:
         if pulse_width is None:
             pulse_width = self.calibration[channel].pulse_width
 
-        self.device.stimulate(channel, intensity, pulse_width)
+        self.device.stimulate(
+            channel=channel, intensity=intensity, pulse_width=pulse_width
+        )
 
     def pulsed_stimulate(
         self,

@@ -19,7 +19,7 @@ readme = "README.md"
 
 
 requires-python = ">=3.9"
-dependencies = ["pyserial"]
+dependencies = ["pyserial", "ipywidgets"]
 
 
 [build-system]

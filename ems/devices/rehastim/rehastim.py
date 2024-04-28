@@ -9,13 +9,14 @@ import binascii
 class Rehastim(Device):
     name: str = "rehastim"
 
-    # Current [0, 2, ..., 126] mA in 2 mA steps
-    intensity_conf = set(list(range(0, 126 + 2, 2)))
+    intensity_min = 0
+    intensity_max = 126
+    intensity_step = 2
 
-    # Pulsewidth [0, 20, 21, ..., 500] µs in 1 µs steps
-    pulse_conf = set(list(range(20, 500 + 1, 1))).add(0)
+    pulse_width_min = 20
+    pulse_width_max = 500
+    pulse_width_step = 1
 
-    # Channels 8 (2 times 4 on two modules)
     n_channels = 8
 
     @classmethod

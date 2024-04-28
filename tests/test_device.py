@@ -5,8 +5,15 @@ from ems.devices import Device
 
 class TestDevice(Device):
     name = "Test Device"
-    intensity_conf = (0, 100)
-    pulse_width_conf = (100, 200)
+
+    intensity_min = 0
+    intensity_max = 100
+    intensity_step = 1
+
+    pulse_width_min = 100
+    pulse_width_max = 200
+    pulse_width_step = 2
+
     n_channels = 4
 
     @classmethod
