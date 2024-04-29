@@ -72,21 +72,21 @@ class Rehastim(Device):
                 #     continue
                 # Generate a single pulse
                 # pulse = [self.calibration[channel][0], self.calibration[channel][1], int(self.calibration[channel][2])] # ch, pw, mA
-                self.ser.write(self._generate_pulse(channel, pulse_width, intensity))
+                self.device.write(self._generate_pulse(channel, pulse_width, intensity))
                 time.sleep(self.delay)
 
         self._runInThread(stimInThread)
 
     def _stimulate_in_thread(self, channel, intensity, pulse_width, pulse_count):
         for _ in range(pulse_count):
-            self.ser.write(self._generate_pulse(channel, pulse_width, intensity))
+            self.device.write(self._generate_pulse(channel, pulse_width, intensity))
             time.sleep(self.delay)
 
     def _decode_response(self):
         """Decodes responses received over the serial port"""
         print("Started a listening SerialThread on " + str(self.ser))
         while True:
-            v = self.ser.read(size=1)
+            v = self.device.read(size=1)
             if len(v) > 0:
                 print("SERIAL_THREAD_RESPONSE:" + str(v))
                 # print(v.decode('utf-8'))
