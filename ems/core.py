@@ -32,7 +32,6 @@ class EMS:
         repr_str = "<ems.EMS>\n"
         repr_str += "Device Information:\n"
         repr_str += f" * Name:  {self.device.name}\n"
-        repr_str += f" * Name:  {self.device.name}\n"
 
         repr_str += "Channel Information (intensity, pulse_width):\n"
         for channel in range(0, self.device.n_channels):
@@ -120,7 +119,7 @@ class EMS:
 
         json_data = json.loads(file_content)
         for key, data in json_data.items():
-            self.set(
+            self.set_pulse(
                 int(key),
                 int(data["intensity"]),
                 int(data["pulse_width"]),

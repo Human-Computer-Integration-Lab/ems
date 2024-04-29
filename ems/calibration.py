@@ -107,3 +107,6 @@ class CalibrationWidget:
         if channel in self._ems.calibration:
             self.intensity_slider.value = self._ems.calibration[channel].intensity
             self.pulse_width_slider.value = self._ems.calibration[channel].pulse_width
+        else:
+            self.intensity_slider.value = self._ems.device.intensity_min
+            self.pulse_width_slider.value = self._ems.device.pulse_width_min

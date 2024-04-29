@@ -1,6 +1,7 @@
 from ..base import Device
 import serial.tools.list_ports
-import rehamove
+
+
 class Rehamove(Device):
     name: str = "rehamove"
     # TODO: fix this
@@ -13,11 +14,14 @@ class Rehamove(Device):
     pulse_width_step = 1
 
     n_channels = 8
+
     @classmethod
     def from_port(cls, port, **kwargs):
-        d = rehamove.Rehamove(port)
-        return cls(d)
-    
+        # d = rehamove.Rehamove(port)
+        # return cls(d)
+        # TODO:
+        return cls(None)
+
     @classmethod
     def guided_setup(cls):
         print("Entering guided setup for the Rehastim device")
@@ -29,14 +33,16 @@ class Rehamove(Device):
             print(f"{i}. {port.device}")
         while True:
             try:
-                choice = int(input("Enter the number of the serial port you want to use: "))
+                choice = int(
+                    input("Enter the number of the serial port you want to use: ")
+                )
                 if choice < 1 or choice > len(ports):
                     print("Invalid choice. Please enter a valid port number.")
                 else:
                     break
             except ValueError:
                 print("Invalid input. Please enter a number.")
-        return cls.from_port(ports[choice-1].device)
+        return cls.from_port(ports[choice - 1].device)
 
     def stimulate(
         self,

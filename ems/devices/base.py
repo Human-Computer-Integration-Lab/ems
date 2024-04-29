@@ -13,7 +13,6 @@ class Device:
 
     n_channels: int = None
 
-    #
     def __init__(self, device):
         self.device = device
 
@@ -28,7 +27,6 @@ class Device:
 
     def stimulate(self, *args, **kwargs):
         raise NotImplementedError
-
 
     def validate(self, channel, intensity, pulse_width):
         """Validates a possible configuration against the device specifications."""
