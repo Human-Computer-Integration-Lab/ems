@@ -2,6 +2,7 @@ from .devices import Device, supported_devices
 from .calibration import CalibrationWidget
 
 import time
+import json
 from IPython.display import display
 
 
@@ -52,6 +53,10 @@ class EMS:
     @classmethod
     def from_device(cls, device: Device):
         """Construct an EMS instance from a user-specified Device."""
+
+        if not isinstance(device, Device):
+            raise ValueError("TODO")
+
         return cls(device)
 
     @classmethod
@@ -86,10 +91,10 @@ class EMS:
 
         return cls(device_obj.from_serial_device(device))
 
-    def set(
+    def calibrate(
         self,
     ):
-        """Calibrates a specified channel for stimulation."""
+        """Calibration utility."""
         calibration_widget = CalibrationWidget(self)
         display(calibration_widget.widget)
 
@@ -109,17 +114,21 @@ class EMS:
 
     def load_calibration_file(self, file_path):
         # raise NotImplementedError
-        with open(file_path, 'r') as file:
-        # Read the content of the file into a string
+        with open(file_path, "r") as file:
+            # Read the content of the file into a string
             file_content = file.read()
 
         json_data = json.loads(file_content)
         for key, data in json_data.items():
-            self.set(int(key), int(data["intensity"]), int(data["pulse_width"]), int(data["pulse_count"]))
+            self.set(
+                int(key),
+                int(data["intensity"]),
+                int(data["pulse_width"]),
+                int(data["pulse_count"]),
+            )
         # TODO
         # 1. read calibration file (i.e. json)
         # 2. repeated calls to calibrate with stimulate=False
-
 
     def save_calibration_file(self, file_path):
         # raise NotImplementedError
@@ -279,14 +288,16 @@ class Channel:
         return {
             "intensity": self._intensity,
             "pulse_width": self._pulse_width,
-            "pulse_count": self._pulse_count
+            "pulse_count": self._pulse_count,
         }
+
 
 # Helper functions for the guided setup options
 def display_options(dictionary):
     print("Choose the device type which you'd like to initialize:")
     for i, key in enumerate(dictionary.keys(), 1):
         print(f"{i}. {key}")
+
 
 def select_option(dictionary):
     while True:
