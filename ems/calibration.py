@@ -16,12 +16,19 @@ class CalibrationWidget:
             icon="bookmark",
         )
 
+        self.clear_button = widgets.Button(
+            description="Clear",
+            disabled=False,
+            tooltip="Clear Channel",
+            icon="eraser",
+        )
+
         self.done_button = widgets.Button(
             description="Done", disabled=False, tooltip="Set Pulse", icon="check"
         )
 
         action_buttons = widgets.HBox(
-            [self.stim_button, self.set_button, self.done_button]
+            [self.stim_button, self.set_button, self.clear_button, self.done_button]
         )
 
         self.channel_buttons = widgets.ToggleButtons(
@@ -70,6 +77,7 @@ class CalibrationWidget:
         self.stim_button.on_click(self.on_stimulate_clicked)
         self.set_button.on_click(self.on_set_pulse_clicked)
         self.done_button.on_click(self.on_done_clicked)
+        self.clear_button.on_click(self.on_clear_clicked)
         self.channel_buttons.observe(self.on_channel_clicked, "value")
 
     def on_stimulate_clicked(self, b):
@@ -85,6 +93,10 @@ class CalibrationWidget:
         pulse_width = self.pulse_width_slider.value
 
         self._ems.set_pulse(channel, intensity, pulse_width)
+
+    def on_clear_clicked(self, b):
+        channel = int(self.channel_buttons.value)
+        del self._ems.calibration[channel]
 
     def on_done_clicked(self, b):
         self.widget.close()
