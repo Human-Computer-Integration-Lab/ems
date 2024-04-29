@@ -1,16 +1,46 @@
-from devices.base import Device
-from devices import supported_devices
-import json
+from .devices import Device, supported_devices
+from .calibration import CalibrationWidget
+
+import time
+from IPython.display import display
+
 
 class EMS:
+    """A device-agnostic interface for performing Electrical Muscle Stimulation.
+
+    Parameters
+    ----------
+    stimulator_handle: Device
+        Reference to the hardware device that will be used for stimulation
+
+     See Also
+    --------
+    EMS.from_port
+    EMS.from_serial_device
+
+    """
+
     def __init__(self, stimulator_handle: Device):
-        """"""
         self.device = stimulator_handle
 
         self.calibration: dict[int, Channel] = {}
 
     def __repr__(self):
-        pass
+        #  TODO: add better alignment
+
+        repr_str = "<ems.EMS>\n"
+        repr_str += "Device Information:\n"
+        repr_str += f" * Name:  {self.device.name}\n"
+        repr_str += f" * Name:  {self.device.name}\n"
+
+        repr_str += "Channel Information (intensity, pulse_width):\n"
+        for channel in range(0, self.device.n_channels):
+            if channel in self.calibration:
+                repr_str += f" * Channel {channel}:     ({self.calibration[channel].intensity}mA, {self.calibration[channel].pulse_width}μs)\n"
+            else:
+                repr_str += f" * Channel {channel}:     Not Calibrated\n"
+
+        return repr_str
 
     @classmethod
     def autodetect(cls):
@@ -18,12 +48,11 @@ class EMS:
         # 1: detect what type of device is being connected and whether it is supported
         # 2. establish a connection
         pass
-    
-    @classmethod
-    def guided_setup(cls):
-        requested_class = select_option(supported_devices)
-        return cls(requested_class.guided_setup())
 
+    @classmethod
+    def from_device(cls, device: Device):
+        """Construct an EMS instance from a user-specified Device."""
+        return cls(device)
 
     @classmethod
     def from_port(cls, port, device_spec: str):
@@ -59,55 +88,24 @@ class EMS:
 
     def set(
         self,
-        channel: int,
-        intensity: int | list[int] = None,
-        pulse_width: int | list[int] = None,
-        pulse_count: int = 1
     ):
-        """Sets parameters for a specified channel for stimulation."""
+        """Calibrates a specified channel for stimulation."""
+        calibration_widget = CalibrationWidget(self)
+        display(calibration_widget.widget)
 
+    def set_pulse(self, channel: int, intensity: int, pulse_width: int):
         if channel not in self.calibration:
             # initialize and store a channel
             self.calibration[channel] = Channel(
                 identifier=channel,
                 intensity=intensity,
                 pulse_width=pulse_width,
-                pulse_count=pulse_count,
                 device=self.device,
             )
         else:
             # update existing values for a channel
             self.calibration[channel].intensity = intensity
             self.calibration[channel].pulse_width = pulse_width
-            self.calibration[channel].pulse_count = pulse_count
-
-    def calibrate(self, channel, pulse_width = 300, pulse_count = 40):
-
-        # ems = SerialThingy.SerialThingy(FAKE_SERIAL)
-        # if len(sys.argv) > 1:
-        #         ems.open_port(str(sys.argv[1]),serial_response_active) # pass the port via the command line, as an argument
-        # else:
-        #         ems.open_port(serial_response_active)
-        intensity = 0
-        while 1:
-            print("Current Intensity (mA):")
-            print(intensity)
-            user_input = input('set intensity (enter to repeat current one, done to finish): ')
-            if user_input == "done":
-                print("calibration done")
-                print("intensity for you: ")
-                print(intensity)
-                self.set(channel=channel, intensity=intensity, pulse_width=pulse_width, pulse_count = pulse_count)
-                # self.channel_calibrated[channel] = True
-                break
-            elif user_input != "":
-                intensity = int(user_input)
-            self.stimulate(channel, intensity, pulse_width, pulse_count)
-            # for i in range(pulse_count):
-            #     ems.write(singlepulse.generate(channel, pulse_width, intensity))
-            #     #ems.write(singlepulse.generate(channel+1, pulse_width, intensity-5))
-            #     #channel number (1-8), pulse width (200-450) in microseconds, intensity (0-100mA, limited 32mA)
-            #     time.sleep(0.01)
 
     def load_calibration_file(self, file_path):
         # raise NotImplementedError
@@ -128,20 +126,56 @@ class EMS:
         # TODO
         # 1. for each channel in self.calibration, convert to JSON
         # 2. store as a single JSON
-        json_data = {key: channel.to_dict() for key, channel in self.calibration.items()}
-        json_string = json.dumps(json_data, indent=4)
-        with open(file_path, 'w') as file:
-            # Write the content to the file
-            file.write(json_string)
+        pass
+
+    def _check_channel_calibration(self, channel, intensity, pulse_width):
+        """Docstring TODO"""
+        if intensity is None or pulse_width is None:
+            # attempt to use a calibrated channel if intensity or pulse_width is not provided
+            if channel not in self.calibration:
+                raise ValueError(
+                    f"Attempting to stimulate channel '{channel}', which is not calibrated. "
+                    f"Please call .calibrate(channel={channel}, ...) before stimulating or "
+                    f"explicitly specify the 'intensity' and 'pulse_width'"
+                )
 
     def stimulate(
         self,
         channel: int,
         intensity: int = None,
         pulse_width: int = None,
-        pulse_count: int = 1,
     ):
-        """Stimulates a given channel ...
+        """Stimulates a single pulse.
+
+        Parameters
+        ----------
+        channel : int
+            Channel identifier used to a select a channel to stimulate
+        intensity: int, optional
+            The intensity of the current used for stimulation, in milliAmperes (mA)
+        pulse_width: int, optional
+            The length of the pulse, in microseconds (μs)
+        """
+        self._check_channel_calibration(channel, intensity, pulse_width)
+
+        if intensity is None:
+            intensity = self.calibration[channel].intensity
+        if pulse_width is None:
+            pulse_width = self.calibration[channel].pulse_width
+
+        self.device.stimulate(
+            channel=channel, intensity=intensity, pulse_width=pulse_width
+        )
+
+    def pulsed_stimulate(
+        self,
+        channel: int,
+        intensity: int = None,
+        pulse_width: int = None,
+        pulse_count: int = 3,
+        delay: int = 0.005,
+    ):
+        """Stimulates multiple pulses seperated by a given delay.
 
         Parameters
         ----------
@@ -152,25 +186,42 @@ class EMS:
         pulse_width: int, optional
             The length of the pulse, in microseconds (μs)
         pulse_count: int, optional
-            TODO
+            The number of pulses to stimulate
+        delay: int, optional
+            The delay between each pulse (in seconds)
         """
+        self._check_channel_calibration(channel, intensity, pulse_width)
 
-        if intensity is None or pulse_width is None:
-            # attempt to use a calibrated channel if intensity or pulse_width is not provided
-            if channel not in self.calibration:
-                raise ValueError(
-                    f"Attempting to stimulate channel '{channel}', which is not calibrate. "
-                    f"Please call .calibrate(channel={channel}, ...) before stimulating"
-                )
-
-        self.device.validate(channel, intensity, pulse_width)
-        self.device.stimulate(channel, intensity, pulse_width, pulse_count)
+        for _ in range(pulse_count):
+            self.device.stimulate(channel, intensity, pulse_width)
+            time.sleep(delay)
 
     def timed_stimulate(self):
         pass
 
-    def delayed_stimulate(self):
-        pass
+    def delayed_stimulate(
+        self,
+        channel: int,
+        intensity: int = None,
+        pulse_width: int = None,
+        delay: int = 2,
+    ):
+        """Stimulates a single pulse after some delay
+
+        Parameters
+        ----------
+        channel : int
+            Channel identifier used to a select a channel to stimulate
+        intensity: int, optional
+            The intensity of the current used for stimulation, in milliAmperes (mA)
+        pulse_width: int, optional
+            The length of the pulse, in microseconds (μs)
+        delay: int, optional
+            The delay between each pulse (in seconds)
+        """
+        self._check_channel_calibration(channel, intensity, pulse_width)
+        time.sleep(delay)
+        self.device.stimulate(channel, intensity, pulse_width)
 
 
 class Channel:
@@ -179,15 +230,10 @@ class Channel:
     def __init__(
         self,
         identifier: int,
-        intensity: int | list[int],
-        pulse_width: int | list[int],
-        pulse_count: int,
+        intensity: int,
+        pulse_width: int,
         device: Device,
     ):
-        """TODO:
-
-        Support a custom waveform with a list of intensities and pulse widths ??
-        """
         self._device = device
 
         # validate channel specifications to ensure they adhere to the device specifications
@@ -196,7 +242,6 @@ class Channel:
         self._identifier = identifier
         self._intensity = intensity
         self._pulse_width = pulse_width
-        self._pulse_count = pulse_count
         self._device = device
 
     def __repr__(self):
@@ -220,18 +265,10 @@ class Channel:
 
     @pulse_width.setter
     def pulse_width(self, pulse_width):
-        """Sets the pulse_width, with validations to ensure the provided pulse_width is within the device specifications."""
+        """Sets the pulse_width, with validations to ensure the provided pulse_width is within the device
+        specifications."""
         self._device._validate_pulse_width(pulse_width)
         self._pulse_width = pulse_width
-
-    @property
-    def pulse_count(self):
-        """The number of stimulation pulses to generate ?"""
-        return self._pulse_count
-
-    @pulse_count.setter
-    def pulse_count(self, pulse_count):
-        self._pulse_count = pulse_count
 
     def to_json(self):
         # convert channel info to json ?

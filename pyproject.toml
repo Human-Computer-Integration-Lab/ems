@@ -1,6 +1,6 @@
-[tool.poetry]
+[project]
 name = "ems"
-version = "0.0.0"
+dynamic = ["version"]
 description = "The description of the package"
 
 classifiers = [
@@ -14,16 +14,26 @@ classifiers = [
   "Topic :: Scientific/Engineering",
 ]
 
-license = "MIT"
-
-authors = [
-    "Philip Chmielowiec <philipc2@uchicago.edu>",
-]
-
-repository = "https://github.com/Human-Computer-Integration-Lab/ems"
-# homepage = ...
+license = {text = "Apache-2.0"}
 readme = "README.md"
 
-[tool.poetry.dependencies]
-python = ">=3.9"
-pyserial = "^3.5"
+
+requires-python = ">=3.9"
+dependencies = ["pyserial", "ipywidgets"]
+
+
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [
+  "setuptools>=60",
+  "setuptools-scm>=8",
+]
+
+[tool.setuptools.packages]
+find = {}
+
+[tool.setuptools_scm]
+fallback_version = "9999"
+
+[tool.ruff.lint]
+ignore = ['E731']

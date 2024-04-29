@@ -4,24 +4,20 @@ import serial
 import time
 import threading
 import binascii
-import serial.tools.list_ports
-get_bin = lambda x, n: x >= 0 and str(bin(x))[2:].zfill(n) or "-" + str(bin(x))[3:].zfill(n)
+
+
 class Rehastim(Device):
     name: str = "rehastim"
-    pulse_count: int = 5
-    min_intensity: int = 0
-    max_intensity: int = 32
-    min_pulse_width: int = 200
-    max_pulse_width: int = 450
-    min_channel: int = 0
-    max_channel: int = 7
-    delay = 0.0098
 
+    intensity_min = 0
+    intensity_max = 126
+    intensity_step = 2
 
+    pulse_width_min = 20
+    pulse_width_max = 500
+    pulse_width_step = 1
 
-    def __repr__(self):
-        # used to display device-specific information (name, make, model, battery, etc.)
-        pass
+    n_channels = 8
 
     @classmethod
     def from_port(cls, port, **kwargs):
@@ -37,124 +33,94 @@ class Rehastim(Device):
             timeout=0,
         )
         return cls(serial_device)
-    
-    # A constructor which takes in a pre-made serial device
-    @classmethod
-    def from_serial_device(cls, dev):
-         return cls(dev)
-    
-    @classmethod
-    def guided_setup(cls):
-        print("Entering guided setup for the Rehastim device")
-        ports = list(serial.tools.list_ports.comports())
-        if len(ports) == 0:
-            raise ValueError("No serial ports available")
-        print("Available serial ports:")
-        for i, port in enumerate(ports, start=1):
-            print(f"{i}. {port.device}")
-        while True:
-            try:
-                choice = int(input("Enter the number of the serial port you want to use: "))
-                if choice < 1 or choice > len(ports):
-                    print("Invalid choice. Please enter a valid port number.")
-                else:
-                    break
-            except ValueError:
-                print("Invalid input. Please enter a number.")
-        return cls.from_port(ports[choice-1].device)
 
+    def stimulate(
+        self,
+        channel: int,
+        intensity: int,
+        pulse_width: int,
+        pulse_count: int,
+        validate_params: bool = True,
+    ):
+        if validate_params:
+            self.validate(channel, intensity, pulse_width)
 
-    # No longer allow intensity, pulse width to be None
-    # This is because calibration data is not stored in this object
-    # but is stored in the handler object
-    # so it doesn't make sense to fall back on it here - the fall back 
-    # should occur upstream
-    def stimulate(self, channel : int, intensity : int, pulse_width: int, pulse_count : int):
-        # Verify 
-        if (intensity < self.min_intensity):
-            raise ValueError("The specified intensity is too low. You provided %d. The minimum intensity is %d" % (intensity, self.min_intensity))
-        if (intensity > self.max_intensity):
-            raise ValueError("The specified intensity is too high. You provided %d. The maximum intensity is %d" % (intensity, self.max_intensity))
-        if (pulse_width < self.min_pulse_width):
-            raise ValueError("The specified pulse width is too low. You provided %d. The minimum pulse width is %d" % (pulse_width, self.min_pulse_width))
-        if (intensity > self.max_intensity):
-            raise ValueError("The specified pulse width is too high. You provided %d. The maximum pulse width is %d" % (intensity, self.max_intensity))
-        if (channel < self.min_channel):
-             raise ValueError("The specified channel is too low")
-        if (channel > self.max_channel):
-             raise ValueError("The specified channel is too high")
+        # Verify
         def stimInThread() -> None:
             for _ in range(pulse_count):
                 # if self.calibration[channel][2] <= 0:
                 #     continue
                 # Generate a single pulse
                 # pulse = [self.calibration[channel][0], self.calibration[channel][1], int(self.calibration[channel][2])] # ch, pw, mA
-                pulse = [channel, pulse_width, intensity] # ch, pw, mA
-                self.device.write(self.__generate_pulse(*pulse))                
+                self.ser.write(self._generate_pulse(channel, pulse_width, intensity))
                 time.sleep(self.delay)
-        self.__runInThread(stimInThread)
 
-    # A method to decode the responses received over the serial port. 
-    # This can be implemented as just a print statement. 
-    # However, it could also be extended to provide exceptions, 
-    # e.g. if the device returns data that is an error
-    def __decode_response(self):
+        self._runInThread(stimInThread)
+
+    def _stimulate_in_thread(self, channel, intensity, pulse_width, pulse_count):
+        for _ in range(pulse_count):
+            self.ser.write(self._generate_pulse(channel, pulse_width, intensity))
+            time.sleep(self.delay)
+
+    def _decode_response(self):
+        """Decodes responses received over the serial port"""
         print("Started a listening SerialThread on " + str(self.ser))
         while True:
             v = self.ser.read(size=1)
-            if(len(v) > 0):
+            if len(v) > 0:
                 print("SERIAL_THREAD_RESPONSE:" + str(v))
                 # print(v.decode('utf-8'))
-                bitstring_v = bin(int.from_bytes(v, byteorder='big'))[2:]
+                bitstring_v = bin(int.from_bytes(v, byteorder="big"))[2:]
                 print(bitstring_v)
-    
 
-    def __generate_pulse(self, channel_number: int, pulse_width: int,pulse_current: int):
-        # global safety_limit
+    def _generate_pulse(
+        self, channel_number: int, pulse_width: int, pulse_current: int
+    ):
         ident = 3
-        # channel_number = _channel_number-1
-        # pulse_width = _pulse_width
-        # if (_pulse_current < safety_limit):
-        #     pulse_current = _pulse_current
-        # else:
-        #     print("SAFETY LIMIT (of " + str(safety_limit) + " EXCEEDED. Request of " + str(_pulse_current) + "dropped to limit")
-        #     pulse_current = safety_limit  
         checksum = (channel_number + pulse_width + pulse_current) % 32
-        #print("checksum verify = " + str(checksum))
 
-        #print("binary command: \n" + 
-        #"\t" + get_bin(ident,2) +  "\t\t#ident\t\t"+ str(len(get_bin(ident,2))) + "\n" + 
-        #"\t" + get_bin(checksum, 5) + "\t\t#checksum\t" + str(len(get_bin(checksum, 5))) + "\n" +  
-        #"\t" + get_bin(channel_number,3) + "\t\t#channel_number\t" + str(len(get_bin(channel_number,3))) + "\n" +  
-        #"\t" + get_bin(pulse_width,9) + "\t#pulse_width\t" + str(len(get_bin(pulse_width,9))) + "\n" +  
-        #"\t" + get_bin(pulse_current,7) + "\t\t#pulse_current\t" + str(len(get_bin(pulse_current,7))) + "\n" 
-        #) 
-        binarized_cmd = get_bin(ident,2) + get_bin(checksum, 5) + get_bin(channel_number,3) + get_bin(pulse_width,9) + get_bin(pulse_current,7)
+        get_bin = (
+            lambda x, n: x >= 0
+            and str(bin(x))[2:].zfill(n)
+            or "-" + str(bin(x))[3:].zfill(n)
+        )
+
+        binarized_cmd = (
+            get_bin(ident, 2)
+            + get_bin(checksum, 5)
+            + get_bin(channel_number, 3)
+            + get_bin(pulse_width, 9)
+            + get_bin(pulse_current, 7)
+        )
         cmd_pointer = 0
         new_cmd_pointer = 0
-        proper_cmd= ["0" for x in range(32)]
+        proper_cmd = ["0" for x in range(32)]
 
         for c in proper_cmd:
-                if new_cmd_pointer == 0: #add a 1
-                        proper_cmd[new_cmd_pointer]="1"
-                elif new_cmd_pointer == (9-1) or new_cmd_pointer == (17-1) or new_cmd_pointer == (25-1): #add a 0 
-                        proper_cmd[new_cmd_pointer]="0"
-                elif new_cmd_pointer == (13-1) or new_cmd_pointer == (14-1): #add a X
-                        proper_cmd[new_cmd_pointer]="0"
-                else:
-                    proper_cmd[new_cmd_pointer]=binarized_cmd[cmd_pointer]
-                    cmd_pointer+=1
-                new_cmd_pointer+=1
+            if new_cmd_pointer == 0:  # add a 1
+                proper_cmd[new_cmd_pointer] = "1"
+            elif (
+                new_cmd_pointer == (9 - 1)
+                or new_cmd_pointer == (17 - 1)
+                or new_cmd_pointer == (25 - 1)
+            ):  # add a 0
+                proper_cmd[new_cmd_pointer] = "0"
+            elif new_cmd_pointer == (13 - 1) or new_cmd_pointer == (14 - 1):  # add a X
+                proper_cmd[new_cmd_pointer] = "0"
+            else:
+                proper_cmd[new_cmd_pointer] = binarized_cmd[cmd_pointer]
+                cmd_pointer += 1
+            new_cmd_pointer += 1
 
-        proper_bin_command = ''.join(map(str,proper_cmd))
-        #print(proper_bin_command)
+        proper_bin_command = "".join(map(str, proper_cmd))
+        # print(proper_bin_command)
 
-        hex_command = (hex(int(proper_bin_command, 2)).replace("0x",''))
-        hex_command = hex_command.replace("L",'')
+        hex_command = hex(int(proper_bin_command, 2)).replace("0x", "")
+        hex_command = hex_command.replace("L", "")
         print(hex(int(proper_bin_command, 2)))
-        return(binascii.unhexlify(hex_command))
-    
-    def __runInThread(self, f):
+        return binascii.unhexlify(hex_command)
+
+    def _run_in_thread(self, f):
         # Create a new thread if currently in the main thread, call f() in this thread otherwise
         if isinstance(threading.current_thread(), threading._MainThread):
             newThread = threading.Thread(target=f)

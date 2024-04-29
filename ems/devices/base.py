@@ -1,12 +1,17 @@
 class Device:
     name: str = None
-    pulse_count: int = None
-    min_intensity: int = None
-    max_intensity: int = None
-    min_pulse_width: int = None
-    max_pulse_width: int = None
-    min_channel: int = None
-    max_channel: int = None
+
+    # intensity configuration
+    intensity_min: int = None
+    intensity_max: int = None
+    intensity_step: int = None
+
+    # pulse width configuration
+    pulse_width_min: int = None
+    pulse_width_max: int = None
+    pulse_width_step: int = None
+
+    n_channels: int = None
 
     #
     def __init__(self, device):
@@ -33,21 +38,33 @@ class Device:
 
     def _validate_intensity(self, intensity):
         """Checks if a provided intensity value is within the device specifications."""
-        if intensity < self.min_intensity or intensity > self.max_intensity:
+
+        if intensity not in range(
+            self.intensity_min,
+            self.intensity_max + self.intensity_step,
+            self.intensity_step,
+        ):
             raise ValueError(
-                f"Invalid value for intensity: {intensity}. Value must be between {self.min_intensity} and {self.max_intensity}"
+                f"Invalid value for intensity: {intensity}. Value must be between {self.intensity_min} and {self.intensity_max} with a step size of "
+                f"{self.pulse_width_step}"
             )
 
     def _validate_pulse_width(self, pulse_width):
         """Checks if a provided pulse_width value is within the device specifications."""
-        if pulse_width < self.min_pulse_width or pulse_width > self.max_pulse_width:
+        if pulse_width not in range(
+            self.pulse_width_min,
+            self.pulse_width_max + self.pulse_width_step,
+            self.pulse_width_step,
+        ):
             raise ValueError(
-                f"Invalid value for pulse_width: {pulse_width}. Value must be between {self.min_pulse_width} and {self.max_pulse_width}"
+                f"Invalid value for pulse_width: {pulse_width}. Value must be between {self.pulse_width_min} and {self.pulse_width_max} with a step size of "
+                f"{self.pulse_width_step}"
             )
 
     def _validate_channel(self, channel):
         """Checks if a provided channel value is within the device specifications."""
-        if channel < self.min_channel or channel > self.max_channel:
+
+        if channel < 0 or channel >= self.n_channels:
             raise ValueError(
-                f"Invalid value for channel: {channel}. Value must be between {self.min_channel} and {self.max_channel}"
+                f"Invalid value for channel: {channel}. Device supports up to {self.n_channels} channels"
             )

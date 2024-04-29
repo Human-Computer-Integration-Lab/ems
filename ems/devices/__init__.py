@@ -1,3 +1,10 @@
-from .rehastim.rehastim import Rehastim
-from .dummy.dummy import Dummy
-supported_devices = {"rehastim": Rehastim, "dummy": Dummy}
+from .rehastim import Rehastim
+from .base import Device
+
+supported_devices = {"rehastim": Rehastim}
+
+__all__ = [
+    "Device",
+    "Rehastim",
+    "supported_devices",
+]
