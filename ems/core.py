@@ -1,5 +1,6 @@
-from .devices import Device, supported_devices
-
+from devices.base import Device
+from devices import supported_devices
+import json
 
 class EMS:
     def __init__(self, stimulator_handle: Device):
@@ -17,6 +18,12 @@ class EMS:
         # 1: detect what type of device is being connected and whether it is supported
         # 2. establish a connection
         pass
+    
+    @classmethod
+    def guided_setup(cls):
+        requested_class = select_option(supported_devices)
+        return cls(requested_class.guided_setup())
+
 
     @classmethod
     def from_port(cls, port, device_spec: str):
@@ -50,15 +57,14 @@ class EMS:
 
         return cls(device_obj.from_serial_device(device))
 
-    def calibrate(
+    def set(
         self,
         channel: int,
         intensity: int | list[int] = None,
         pulse_width: int | list[int] = None,
-        pulse_count: int = 1,
-        stimulate: bool = True,
+        pulse_count: int = 1
     ):
-        """Calibrates a specified channel for stimulation."""
+        """Sets parameters for a specified channel for stimulation."""
 
         if channel not in self.calibration:
             # initialize and store a channel
@@ -75,21 +81,58 @@ class EMS:
             self.calibration[channel].pulse_width = pulse_width
             self.calibration[channel].pulse_count = pulse_count
 
-        if stimulate:
-            # stimulate the pulse for calibration
+    def calibrate(self, channel, pulse_width = 300, pulse_count = 40):
+
+        # ems = SerialThingy.SerialThingy(FAKE_SERIAL)
+        # if len(sys.argv) > 1:
+        #         ems.open_port(str(sys.argv[1]),serial_response_active) # pass the port via the command line, as an argument
+        # else:
+        #         ems.open_port(serial_response_active)
+        intensity = 0
+        while 1:
+            print("Current Intensity (mA):")
+            print(intensity)
+            user_input = input('set intensity (enter to repeat current one, done to finish): ')
+            if user_input == "done":
+                print("calibration done")
+                print("intensity for you: ")
+                print(intensity)
+                self.set(channel=channel, intensity=intensity, pulse_width=pulse_width, pulse_count = pulse_count)
+                # self.channel_calibrated[channel] = True
+                break
+            elif user_input != "":
+                intensity = int(user_input)
             self.stimulate(channel, intensity, pulse_width, pulse_count)
+            # for i in range(pulse_count):
+            #     ems.write(singlepulse.generate(channel, pulse_width, intensity))
+            #     #ems.write(singlepulse.generate(channel+1, pulse_width, intensity-5))
+            #     #channel number (1-8), pulse width (200-450) in microseconds, intensity (0-100mA, limited 32mA)
+            #     time.sleep(0.01)
 
     def load_calibration_file(self, file_path):
+        # raise NotImplementedError
+        with open(file_path, 'r') as file:
+        # Read the content of the file into a string
+            file_content = file.read()
+
+        json_data = json.loads(file_content)
+        for key, data in json_data.items():
+            self.set(int(key), int(data["intensity"]), int(data["pulse_width"]), int(data["pulse_count"]))
         # TODO
         # 1. read calibration file (i.e. json)
         # 2. repeated calls to calibrate with stimulate=False
-        pass
+
 
     def save_calibration_file(self, file_path):
+        # raise NotImplementedError
         # TODO
         # 1. for each channel in self.calibration, convert to JSON
         # 2. store as a single JSON
-        pass
+        json_data = {key: channel.to_dict() for key, channel in self.calibration.items()}
+        json_string = json.dumps(json_data, indent=4)
+        with open(file_path, 'w') as file:
+            # Write the content to the file
+            file.write(json_string)
 
     def stimulate(
         self,
@@ -120,6 +163,7 @@ class EMS:
                     f"Please call .calibrate(channel={channel}, ...) before stimulating"
                 )
 
+        self.device.validate(channel, intensity, pulse_width)
         self.device.stimulate(channel, intensity, pulse_width, pulse_count)
 
     def timed_stimulate(self):
@@ -192,3 +236,30 @@ class Channel:
     def to_json(self):
         # convert channel info to json ?
         pass
+
+    def to_dict(self) -> dict:
+        """Convert Channel object to dictionary."""
+        return {
+            "intensity": self._intensity,
+            "pulse_width": self._pulse_width,
+            "pulse_count": self._pulse_count
+        }
+
+# Helper functions for the guided setup options
+def display_options(dictionary):
+    print("Choose the device type which you'd like to initialize:")
+    for i, key in enumerate(dictionary.keys(), 1):
+        print(f"{i}. {key}")
+
+def select_option(dictionary):
+    while True:
+        display_options(dictionary)
+        choice = input("Enter the number of your choice: ")
+        try:
+            choice = int(choice)
+            if 1 <= choice <= len(dictionary):
+                return dictionary[list(dictionary.keys())[choice - 1]]
+            else:
+                print("Invalid choice. Please enter a valid number.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")

@@ -4,7 +4,7 @@ import serial
 import time
 import threading
 import binascii
-
+import serial.tools.list_ports
 get_bin = lambda x, n: x >= 0 and str(bin(x))[2:].zfill(n) or "-" + str(bin(x))[3:].zfill(n)
 class Rehastim(Device):
     name: str = "rehastim"
@@ -15,6 +15,9 @@ class Rehastim(Device):
     max_pulse_width: int = 450
     min_channel: int = 0
     max_channel: int = 7
+    delay = 0.0098
+
+
 
     def __repr__(self):
         # used to display device-specific information (name, make, model, battery, etc.)
@@ -36,8 +39,29 @@ class Rehastim(Device):
         return cls(serial_device)
     
     # A constructor which takes in a pre-made serial device
+    @classmethod
     def from_serial_device(cls, dev):
          return cls(dev)
+    
+    @classmethod
+    def guided_setup(cls):
+        print("Entering guided setup for the Rehastim device")
+        ports = list(serial.tools.list_ports.comports())
+        if len(ports) == 0:
+            raise ValueError("No serial ports available")
+        print("Available serial ports:")
+        for i, port in enumerate(ports, start=1):
+            print(f"{i}. {port.device}")
+        while True:
+            try:
+                choice = int(input("Enter the number of the serial port you want to use: "))
+                if choice < 1 or choice > len(ports):
+                    print("Invalid choice. Please enter a valid port number.")
+                else:
+                    break
+            except ValueError:
+                print("Invalid input. Please enter a number.")
+        return cls.from_port(ports[choice-1].device)
 
 
     # No longer allow intensity, pulse width to be None
@@ -45,19 +69,19 @@ class Rehastim(Device):
     # but is stored in the handler object
     # so it doesn't make sense to fall back on it here - the fall back 
     # should occur upstream
-    def stim(self, channel : int, intensity : int, pulse_width: int, pulse_count : int):
+    def stimulate(self, channel : int, intensity : int, pulse_width: int, pulse_count : int):
         # Verify 
-        if (intensity < self.minIntensity):
-            raise ValueError("The specified intensity is too low. You provided %d. The minimum intensity is %d" % (intensity, self.minIntensity))
-        if (intensity > self.maxIntensity):
-            raise ValueError("The specified intensity is too high. You provided %d. The maximum intensity is %d" % (intensity, self.maxIntensity))
-        if (pulse_width < self.minPulseWidth):
-            raise ValueError("The specified pulse width is too low. You provided %d. The minimum pulse width is %d" % (pulse_width, self.minPulseWidth))
-        if (intensity > self.maxIntensity):
-            raise ValueError("The specified pulse width is too high. You provided %d. The maximum pulse width is %d" % (intensity, self.maxIntensity))
-        if (channel < self.minChannel):
+        if (intensity < self.min_intensity):
+            raise ValueError("The specified intensity is too low. You provided %d. The minimum intensity is %d" % (intensity, self.min_intensity))
+        if (intensity > self.max_intensity):
+            raise ValueError("The specified intensity is too high. You provided %d. The maximum intensity is %d" % (intensity, self.max_intensity))
+        if (pulse_width < self.min_pulse_width):
+            raise ValueError("The specified pulse width is too low. You provided %d. The minimum pulse width is %d" % (pulse_width, self.min_pulse_width))
+        if (intensity > self.max_intensity):
+            raise ValueError("The specified pulse width is too high. You provided %d. The maximum pulse width is %d" % (intensity, self.max_intensity))
+        if (channel < self.min_channel):
              raise ValueError("The specified channel is too low")
-        if (channel > self.maxChannel):
+        if (channel > self.max_channel):
              raise ValueError("The specified channel is too high")
         def stimInThread() -> None:
             for _ in range(pulse_count):
@@ -66,7 +90,7 @@ class Rehastim(Device):
                 # Generate a single pulse
                 # pulse = [self.calibration[channel][0], self.calibration[channel][1], int(self.calibration[channel][2])] # ch, pw, mA
                 pulse = [channel, pulse_width, intensity] # ch, pw, mA
-                self.ser.write(self.__generate_pulse(*pulse))                
+                self.device.write(self.__generate_pulse(*pulse))                
                 time.sleep(self.delay)
         self.__runInThread(stimInThread)
 

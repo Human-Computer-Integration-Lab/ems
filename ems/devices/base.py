@@ -9,11 +9,12 @@ class Device:
     max_channel: int = None
 
     #
-    def __init__(self, serial_device):
-        self.serial_device = serial_device
+    def __init__(self, device):
+        self.device = device
 
     @classmethod
     def from_port(cls, port, **kwargs):
+        raise NotImplementedError
         pass
 
     @classmethod
@@ -21,8 +22,8 @@ class Device:
         return cls(device)
 
     def stimulate(self, *args, **kwargs):
-        # TODO: each device MUST have a stimulate method
-        pass
+        raise NotImplementedError
+
 
     def validate(self, channel, intensity, pulse_width):
         """Validates a possible configuration against the device specifications."""
