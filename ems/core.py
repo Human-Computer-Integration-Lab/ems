@@ -90,7 +90,7 @@ class EMS:
 
         return cls(device_obj.from_serial_device(device))
 
-    def calibrate(
+    def visual_calibrate(
         self,
     ):
         """Calibration utility."""
