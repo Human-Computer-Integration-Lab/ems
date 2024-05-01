@@ -1,6 +1,8 @@
 from ..base import Device
 import serial.tools.list_ports
-import rehamove
+from . import rehamove
+
+
 class Rehamove(Device):
     name: str = "rehamove"
     # TODO: fix this
