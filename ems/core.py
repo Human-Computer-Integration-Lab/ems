@@ -161,15 +161,8 @@ class EMS:
                 int(data["pulse_width"]),
                 int(data["pulse_count"]),
             )
-        # TODO
-        # 1. read calibration file (i.e. json)
-        # 2. repeated calls to calibrate with stimulate=False
 
     def save_calibration_file(self, file_path):
-        # raise NotImplementedError
-        # TODO
-        # 1. for each channel in self.calibration, convert to JSON
-        # 2. store as a single JSON
         json_data = {key: channel.to_dict() for key, channel in self.calibration.items()}
         json_string = json.dumps(json_data, indent=4)
         with open(file_path, 'w') as file:
