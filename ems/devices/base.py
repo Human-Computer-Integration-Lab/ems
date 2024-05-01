@@ -44,7 +44,7 @@ class Device:
         ):
             raise ValueError(
                 f"Invalid value for intensity: {intensity}. Value must be between {self.intensity_min} and {self.intensity_max} with a step size of "
-                f"{self.pulse_width_step}"
+                f"{self.intensity_step}"
             )
 
     def _validate_pulse_width(self, pulse_width):
