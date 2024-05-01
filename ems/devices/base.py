@@ -19,7 +19,6 @@ class Device:
     @classmethod
     def from_port(cls, port, **kwargs):
         raise NotImplementedError
-        pass
 
     @classmethod
     def from_serial_device(cls, device):
