@@ -1,4 +1,4 @@
-from .dummy import Rehastim
+from .rehastim import Rehastim
 from .rehamove import Rehamove
 from .base import Device
 from .dummy import Dummy
