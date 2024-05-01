@@ -10,12 +10,13 @@ import binascii
 class Dummy(Device):
     name: str = "Dummy Device"
     pulse_count: int = 5
-    min_intensity: int = 0
-    max_intensity: int = 32
-    min_pulse_width: int = 200
-    max_pulse_width: int = 450
-    min_channel: int = 0
-    max_channel: int = 7
+    intensity_min: int = 0
+    intensity_max: int = 32
+    intensity_step: int = 1
+    pulse_width_min: int = 200
+    pulse_width_max: int = 450
+    pulse_width_step: int = 1
+    n_channels: int = 8
 
     def __repr__(self):
         # used to display device-specific information (name, make, model, battery, etc.)
