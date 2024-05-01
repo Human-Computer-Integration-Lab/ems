@@ -118,7 +118,7 @@ class EMS:
                 break
             elif user_input != "":
                 intensity = int(user_input)
-            self.stimulate(channel, intensity, pulse_width, pulse_count)
+            self.pulsed_stimulate(channel, intensity, pulse_width, pulse_count)
             # for i in range(pulse_count):
             #     ems.write(singlepulse.generate(channel, pulse_width, intensity))
             #     #ems.write(singlepulse.generate(channel+1, pulse_width, intensity-5))
@@ -198,7 +198,7 @@ class EMS:
         pulse_width: int, optional
             The length of the pulse, in microseconds (μs)
         """
-        # self._check_channel_calibration(channel, intensity, pulse_width)
+        self._check_channel_calibration(channel, intensity, pulse_width)
 
         if intensity is None:
             intensity = self.calibration[channel].intensity
@@ -232,10 +232,10 @@ class EMS:
         delay: int, optional
             The delay between each pulse (in seconds)
         """
-        # self._check_channel_calibration(channel, intensity, pulse_width)
+        self._check_channel_calibration(channel, intensity, pulse_width)
 
         for _ in range(pulse_count):
-            self.device.stimulate(channel, intensity, pulse_width)
+            self.stimulate(channel, intensity, pulse_width)
             time.sleep(delay)
 
     def timed_stimulate(self):
@@ -261,7 +261,7 @@ class EMS:
         delay: int, optional
             The delay between each pulse (in seconds)
         """
-        # self._check_channel_calibration(channel, intensity, pulse_width)
+        self._check_channel_calibration(channel, intensity, pulse_width)
         time.sleep(delay)
         self.device.stimulate(channel, intensity, pulse_width)
 
