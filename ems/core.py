@@ -298,7 +298,6 @@ class Channel:
         return {
             "intensity": self._intensity,
             "pulse_width": self._pulse_width,
-            "pulse_count": self._pulse_count,
         }
 
 
