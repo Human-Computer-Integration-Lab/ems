@@ -90,6 +90,12 @@ class EMS:
 
         return cls(device_obj.from_serial_device(device))
 
+
+    @classmethod
+    def guided_setup(cls):
+        requested_class = select_option(supported_devices)
+        return cls(requested_class.guided_setup())
+
     def visual_calibrate(
         self,
     ):
