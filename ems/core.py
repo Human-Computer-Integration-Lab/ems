@@ -95,6 +95,36 @@ class EMS:
     def guided_setup(cls):
         requested_class = select_option(supported_devices)
         return cls(requested_class.guided_setup())
+    
+
+    def calibrate(self, channel, pulse_width = 300, pulse_count = 10):
+
+        # ems = SerialThingy.SerialThingy(FAKE_SERIAL)
+        # if len(sys.argv) > 1:
+        #         ems.open_port(str(sys.argv[1]),serial_response_active) # pass the port via the command line, as an argument
+        # else:
+        #         ems.open_port(serial_response_active)
+        intensity = 0
+        while 1:
+            print("Current Intensity (mA):")
+            print(intensity)
+            user_input = input('set intensity (enter to repeat current one, done to finish): ')
+            if user_input == "done":
+                print("calibration done")
+                print("intensity for you: ")
+                print(intensity)
+                self.set_pulse(channel=channel, intensity=intensity, pulse_width=pulse_width)
+                # self.channel_calibrated[channel] = True
+                break
+            elif user_input != "":
+                intensity = int(user_input)
+            self.stimulate(channel, intensity, pulse_width, pulse_count)
+            # for i in range(pulse_count):
+            #     ems.write(singlepulse.generate(channel, pulse_width, intensity))
+            #     #ems.write(singlepulse.generate(channel+1, pulse_width, intensity-5))
+            #     #channel number (1-8), pulse width (200-450) in microseconds, intensity (0-100mA, limited 32mA)
+            #     time.sleep(0.01)
+
 
     def visual_calibrate(
         self,
@@ -175,7 +205,7 @@ class EMS:
         pulse_width: int, optional
             The length of the pulse, in microseconds (μs)
         """
-        self._check_channel_calibration(channel, intensity, pulse_width)
+        # self._check_channel_calibration(channel, intensity, pulse_width)
 
         if intensity is None:
             intensity = self.calibration[channel].intensity
@@ -209,7 +239,7 @@ class EMS:
         delay: int, optional
             The delay between each pulse (in seconds)
         """
-        self._check_channel_calibration(channel, intensity, pulse_width)
+        # self._check_channel_calibration(channel, intensity, pulse_width)
 
         for _ in range(pulse_count):
             self.device.stimulate(channel, intensity, pulse_width)
@@ -238,7 +268,7 @@ class EMS:
         delay: int, optional
             The delay between each pulse (in seconds)
         """
-        self._check_channel_calibration(channel, intensity, pulse_width)
+        # self._check_channel_calibration(channel, intensity, pulse_width)
         time.sleep(delay)
         self.device.stimulate(channel, intensity, pulse_width)
 
