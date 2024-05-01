@@ -47,7 +47,7 @@ class EMS:
         # should be able to:
         # 1: detect what type of device is being connected and whether it is supported
         # 2. establish a connection
-        pass
+        raise NotImplementedError
 
     @classmethod
     def from_device(cls, device: Device):
@@ -140,7 +140,12 @@ class EMS:
         # TODO
         # 1. for each channel in self.calibration, convert to JSON
         # 2. store as a single JSON
-        pass
+        json_data = {key: channel.to_dict() for key, channel in self.calibration.items()}
+        json_string = json.dumps(json_data, indent=4)
+        with open(file_path, 'w') as file:
+            # Write the content to the file
+            file.write(json_string)
+
 
     def _check_channel_calibration(self, channel, intensity, pulse_width):
         """Docstring TODO"""
@@ -259,7 +264,7 @@ class Channel:
         self._device = device
 
     def __repr__(self):
-        pass
+        raise NotImplementedError
 
     @property
     def intensity(self):
@@ -286,7 +291,7 @@ class Channel:
 
     def to_json(self):
         # convert channel info to json ?
-        pass
+        raise NotImplementedError
 
     def to_dict(self) -> dict:
         """Convert Channel object to dictionary."""
