@@ -183,7 +183,7 @@ class EMS:
             pulse_width = self.calibration[channel].pulse_width
 
         self.device.stimulate(
-            channel=channel, intensity=intensity, pulse_width=pulse_width
+            channel=channel, intensity=intensity, pulse_width=pulse_width, pulse_count=1
         )
 
     def pulsed_stimulate(
