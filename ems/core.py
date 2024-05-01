@@ -1,6 +1,6 @@
-from .devices import Device, supported_devices
-from .calibration import CalibrationWidget
-
+from devices import Device, supported_devices
+from calibration import CalibrationWidget
+import json
 import time
 from IPython.display import display
 
