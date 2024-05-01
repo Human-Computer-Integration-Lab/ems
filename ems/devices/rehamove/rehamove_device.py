@@ -7,11 +7,11 @@ class Rehamove(Device):
     name: str = "rehamove"
     # TODO: fix this
     intensity_min = 0
-    intensity_max = 126
-    intensity_step = 2
+    intensity_max = 150
+    intensity_step = 1
 
-    pulse_width_min = 20
-    pulse_width_max = 500
+    pulse_width_min = 10
+    pulse_width_max = 4000
     pulse_width_step = 1
 
     n_channels = 8
@@ -48,7 +48,8 @@ class Rehamove(Device):
         pulse_count: int,
         validate_params: bool = True,
     ):
+        print("test")
         if validate_params:
             self.validate(channel, intensity, pulse_width)
         for _ in range(pulse_count):
-            self.device.pulse(channel, intensity, pulse_width)
+            x = self.device.pulse(channel, intensity, pulse_width)
