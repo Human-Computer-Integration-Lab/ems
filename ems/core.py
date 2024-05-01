@@ -211,7 +211,7 @@ class EMS:
             time.sleep(delay)
 
     def timed_stimulate(self):
-        pass
+        raise NotImplementedError
 
     def delayed_stimulate(
         self,
