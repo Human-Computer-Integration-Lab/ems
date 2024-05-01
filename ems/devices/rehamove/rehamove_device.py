@@ -5,7 +5,6 @@ from . import rehamove
 
 class Rehamove(Device):
     name: str = "rehamove"
-    # TODO: fix this
     intensity_min = 0
     intensity_max = 150
     intensity_step = 1
