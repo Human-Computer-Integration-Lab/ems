@@ -36,23 +36,23 @@ class Dummy(Device):
     @classmethod
     def guided_setup(cls):
         print("The dummy device requires no guided setup")
-        print("Let's still fake the serial port selection")
+        # print("Let's still fake the serial port selection")
 
-        ports = list(serial.tools.list_ports.comports())
-        if len(ports) == 0:
-            raise ValueError("No serial ports available")
-        print("Available serial ports:")
-        for i, port in enumerate(ports, start=1):
-            print(f"{i}. {port.device}")
-        while True:
-            try:
-                choice = int(input("Enter the number of the serial port you want to use: "))
-                if choice < 1 or choice > len(ports):
-                    print("Invalid choice. Please enter a valid port number.")
-                else:
-                    break
-            except ValueError:
-                print("Invalid input. Please enter a number.")
+        # ports = list(serial.tools.list_ports.comports())
+        # if len(ports) == 0:
+        #     raise ValueError("No serial ports available")
+        # print("Available serial ports:")
+        # for i, port in enumerate(ports, start=1):
+        #     print(f"{i}. {port.device}")
+        # while True:
+        #     try:
+        #         choice = int(input("Enter the number of the serial port you want to use: "))
+        #         if choice < 1 or choice > len(ports):
+        #             print("Invalid choice. Please enter a valid port number.")
+        #         else:
+        #             break
+        #     except ValueError:
+        #         print("Invalid input. Please enter a number.")
         return cls(None)
 
     # No longer allow intensity, pulse width to be None

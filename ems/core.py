@@ -4,8 +4,9 @@ import json
 import time
 import json
 from IPython.display import display
-
-
+import threading
+from pythonosc import osc_server, dispatcher
+# from pythonosc.dispatcher import Dispatcher
 class EMS:
     """A device-agnostic interface for performing Electrical Muscle Stimulation.
 
@@ -264,6 +265,24 @@ class EMS:
         self._check_channel_calibration(channel, intensity, pulse_width)
         time.sleep(delay)
         self.device.stimulate(channel, intensity, pulse_width)
+
+    def listen(self, port):
+        osc_dispatcher = dispatcher.Dispatcher()
+        osc_dispatcher.set_default_handler(self.osc_handler)
+        server_thread = threading.Thread(target=self.start_osc_server, args=(port, osc_dispatcher))
+        server_thread.start()
+
+    def osc_handler(self, address, *args):
+            method_name = address.strip('/')
+            if hasattr(self, method_name) and callable(getattr(self, method_name)):
+                getattr(self, method_name)(*args)
+
+    def start_osc_server(self, port, osc_dispatcher):
+        server = osc_server.ThreadingOSCUDPServer(("127.0.0.1", port), osc_dispatcher)
+        print("OSC Server listening on port", port)
+        server.serve_forever()
+
+
 
 
 class Channel:
