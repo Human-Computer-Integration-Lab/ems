@@ -33,7 +33,7 @@ class Rehastim(Device):
             timeout=0,
         )
         return cls(serial_device)
-    
+
     @classmethod
     def guided_setup(cls):
         print("Entering guided setup for the Rehastim device")
@@ -45,14 +45,16 @@ class Rehastim(Device):
             print(f"{i}. {port.device}")
         while True:
             try:
-                choice = int(input("Enter the number of the serial port you want to use: "))
+                choice = int(
+                    input("Enter the number of the serial port you want to use: ")
+                )
                 if choice < 1 or choice > len(ports):
                     print("Invalid choice. Please enter a valid port number.")
                 else:
                     break
             except ValueError:
                 print("Invalid input. Please enter a number.")
-        return cls.from_port(ports[choice-1].device)
+        return cls.from_port(ports[choice - 1].device)
 
     def stimulate(
         self,

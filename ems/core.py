@@ -2,7 +2,6 @@ from devices import Device, supported_devices
 from calibration import CalibrationWidget
 import json
 import time
-import json
 from IPython.display import display
 import threading
 from pythonosc import osc_server, dispatcher
@@ -91,15 +90,12 @@ class EMS:
 
         return cls(device_obj.from_serial_device(device))
 
-
     @classmethod
     def guided_setup(cls):
         requested_class = select_option(supported_devices)
         return cls(requested_class.guided_setup())
-    
 
-    def calibrate(self, channel, pulse_width = 300, pulse_count = 10):
-
+    def calibrate(self, channel, pulse_width=300, pulse_count=10):
         # ems = SerialThingy.SerialThingy(FAKE_SERIAL)
         # if len(sys.argv) > 1:
         #         ems.open_port(str(sys.argv[1]),serial_response_active) # pass the port via the command line, as an argument
@@ -109,12 +105,16 @@ class EMS:
         while 1:
             print("Current Intensity (mA):")
             print(intensity)
-            user_input = input('set intensity (enter to repeat current one, done to finish): ')
+            user_input = input(
+                "set intensity (enter to repeat current one, done to finish): "
+            )
             if user_input == "done":
                 print("calibration done")
                 print("intensity for you: ")
                 print(intensity)
-                self.set_pulse(channel=channel, intensity=intensity, pulse_width=pulse_width)
+                self.set_pulse(
+                    channel=channel, intensity=intensity, pulse_width=pulse_width
+                )
                 # self.channel_calibrated[channel] = True
                 break
             elif user_input != "":
@@ -125,7 +125,6 @@ class EMS:
             #     #ems.write(singlepulse.generate(channel+1, pulse_width, intensity-5))
             #     #channel number (1-8), pulse width (200-450) in microseconds, intensity (0-100mA, limited 32mA)
             #     time.sleep(0.01)
-
 
     def visual_calibrate(
         self,
@@ -164,12 +163,13 @@ class EMS:
             )
 
     def save_calibration_file(self, file_path):
-        json_data = {key: channel.to_dict() for key, channel in self.calibration.items()}
+        json_data = {
+            key: channel.to_dict() for key, channel in self.calibration.items()
+        }
         json_string = json.dumps(json_data, indent=4)
-        with open(file_path, 'w') as file:
+        with open(file_path, "w") as file:
             # Write the content to the file
             file.write(json_string)
-
 
     def _check_channel_calibration(self, channel, intensity, pulse_width):
         """Docstring TODO"""
