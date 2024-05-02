@@ -2,9 +2,6 @@ from ..base import Device
 
 import serial
 import serial.tools.list_ports
-import time
-import threading
-import binascii
 
 
 class Dummy(Device):
@@ -23,15 +20,14 @@ class Dummy(Device):
         print("I'm a dummy device")
         pass
 
-
     @classmethod
     def from_port(cls, port, **kwargs):
         return cls(None)
-    
+
     # A constructor which takes in a pre-made serial device
     @classmethod
     def from_serial_device(cls, dev):
-         return cls(dev)
+        return cls(dev)
 
     @classmethod
     def guided_setup(cls):
@@ -46,7 +42,9 @@ class Dummy(Device):
             print(f"{i}. {port.device}")
         while True:
             try:
-                choice = int(input("Enter the number of the serial port you want to use: "))
+                choice = int(
+                    input("Enter the number of the serial port you want to use: ")
+                )
                 if choice < 1 or choice > len(ports):
                     print("Invalid choice. Please enter a valid port number.")
                 else:
@@ -58,12 +56,13 @@ class Dummy(Device):
     # No longer allow intensity, pulse width to be None
     # This is because calibration data is not stored in this object
     # but is stored in the handler object
-    # so it doesn't make sense to fall back on it here - the fall back 
+    # so it doesn't make sense to fall back on it here - the fall back
     # should occur upstream
-    def stimulate(self, channel : int, intensity : int, pulse_width: int, pulse_count : int):
+    def stimulate(
+        self, channel: int, intensity: int, pulse_width: int, pulse_count: int
+    ):
         print("I'm stimulating!")
-        print("Dummy Device: Stimulating channel %d with intensity %d, pulse width %d, pulse count %d" % (channel, intensity, pulse_width, pulse_count))
-
-
-
-
+        print(
+            "Dummy Device: Stimulating channel %d with intensity %d, pulse width %d, pulse count %d"
+            % (channel, intensity, pulse_width, pulse_count)
+        )

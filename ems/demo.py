@@ -1,5 +1,6 @@
 from core import EMS
 import time
+
 my_device = EMS.guided_setup()
 my_device.set_pulse(1, 6, 200)
 my_device.save_calibration_file("user_calibration.json")
