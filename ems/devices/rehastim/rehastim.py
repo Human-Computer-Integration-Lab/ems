@@ -1,4 +1,9 @@
-from ..base import Device
+from ..base import (
+    Device,
+    IntensityConfiguration,
+    PulseWidthConfiguration,
+    ChannelConfiguration,
+)
 
 import serial
 import time
@@ -6,7 +11,9 @@ import threading
 import binascii
 
 
-class Rehastim(Device):
+class Rehastim(
+    Device, IntensityConfiguration, PulseWidthConfiguration, ChannelConfiguration
+):
     name: str = "rehastim"
 
     intensity_min = 0
@@ -75,9 +82,9 @@ class Rehastim(Device):
                 # Generate a single pulse
                 # pulse = [self.calibration[channel][0], self.calibration[channel][1], int(self.calibration[channel][2])] # ch, pw, mA
                 self.device.write(self._generate_pulse(channel, pulse_width, intensity))
-                time.sleep(self.delay)
+                time.sleep(0.01)
 
-        self._runInThread(stimInThread)
+        self._run_in_thread(stimInThread)
 
     def _stimulate_in_thread(self, channel, intensity, pulse_width, pulse_count):
         for _ in range(pulse_count):

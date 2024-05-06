@@ -1,11 +1,12 @@
-from devices import Device, supported_devices
-from calibration import CalibrationWidget
+from .devices import Device, supported_devices
+from .calibration import CalibrationWidget
 import json
 import time
 from IPython.display import display
 import threading
 from pythonosc import osc_server, dispatcher
-# from pythonosc.dispatcher import Dispatcher
+
+
 class EMS:
     """A device-agnostic interface for performing Electrical Muscle Stimulation.
 
@@ -27,7 +28,7 @@ class EMS:
         self.calibration: dict[int, Channel] = {}
 
     def __repr__(self):
-        #  TODO: add better alignment
+        #  TODO: add better alignment, need to generalize
 
         repr_str = "<ems.EMS>\n"
         repr_str += "Device Information:\n"
@@ -126,7 +127,7 @@ class EMS:
             #     #channel number (1-8), pulse width (200-450) in microseconds, intensity (0-100mA, limited 32mA)
             #     time.sleep(0.01)
 
-    def visual_calibrate(
+    def calibrate_widget(
         self,
     ):
         """Calibration utility."""
@@ -187,6 +188,8 @@ class EMS:
         channel: int,
         intensity: int = None,
         pulse_width: int = None,
+        valdiate: bool = True,
+        **kwargs,
     ):
         """Stimulates a single pulse.
 
@@ -269,13 +272,15 @@ class EMS:
     def listen(self, port):
         osc_dispatcher = dispatcher.Dispatcher()
         osc_dispatcher.set_default_handler(self.osc_handler)
-        server_thread = threading.Thread(target=self.start_osc_server, args=(port, osc_dispatcher))
+        server_thread = threading.Thread(
+            target=self.start_osc_server, args=(port, osc_dispatcher)
+        )
         server_thread.start()
 
     def osc_handler(self, address, *args):
-            method_name = address.strip('/')
-            if hasattr(self, method_name) and callable(getattr(self, method_name)):
-                getattr(self, method_name)(*args)
+        method_name = address.strip("/")
+        if hasattr(self, method_name) and callable(getattr(self, method_name)):
+            getattr(self, method_name)(*args)
 
     def start_osc_server(self, port, osc_dispatcher):
         server = osc_server.ThreadingOSCUDPServer(("127.0.0.1", port), osc_dispatcher)
@@ -283,6 +288,60 @@ class EMS:
         server.serve_forever()
 
 
+class Profile:
+    def __init__(
+        self,
+        device: Device,
+        id: int = None,
+        intensity: int = None,
+        pulse_width: int = None,
+    ):
+        self._device = device
+
+        # validate channel specifications to ensure they adhere to the device specifications
+        self._device.validate(id, intensity, pulse_width)
+
+        self._id = id
+        self._intensity = intensity
+        self._pulse_width = pulse_width
+
+    def __repr__(self):
+        raise NotImplementedError
+
+    @property
+    def intensity(self):
+        """The intensity of the current, in milliAmperes (mA)"""
+        return self._intensity
+
+    @intensity.setter
+    def intensity(self, intensity):
+        """Sets the intensity, with validations to ensure the provided intensity is within the device specifications."""
+        self._device._validate_intensity(intensity)
+        self._intensity = intensity
+
+    @property
+    def pulse_width(self):
+        """The length of the pulse, in microseconds (μs)"""
+        return self._pulse_width
+
+    @pulse_width.setter
+    def pulse_width(self, pulse_width):
+        """Sets the pulse_width, with validations to ensure the provided pulse_width is within the device
+        specifications."""
+        self._device._validate_pulse_width(pulse_width)
+        self._pulse_width = pulse_width
+
+    def to_json(self):
+        # convert channel info to json ?
+        raise NotImplementedError
+
+    def to_dict(self) -> dict:
+        """Convert Channel object to dictionary."""
+
+        return {
+            "intensity": self._intensity,
+            "pulse_width": self._pulse_width,
+        }
 
 
 class Channel:

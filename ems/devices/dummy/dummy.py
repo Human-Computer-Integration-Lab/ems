@@ -1,85 +1,91 @@
-from ..base import Device
+# from ..base import Device
+#
+# import serial
+# import serial.tools.list_ports
+#
 
-import serial
-import serial.tools.list_ports
+
+class Dummy:
+    pass
 
 
-class Dummy(Device):
-    name: str = "Dummy Device"
-    pulse_count: int = 5
-    intensity_min: int = 0
-    intensity_max: int = 32
-    intensity_step: int = 1
-    pulse_width_min: int = 200
-    pulse_width_max: int = 450
-    pulse_width_step: int = 1
-    n_channels: int = 8
-
-    def __repr__(self):
-        # used to display device-specific information (name, make, model, battery, etc.)
-        print("I'm a dummy device")
-        pass
-
-    @classmethod
-    def from_port(cls, port, **kwargs):
-        return cls(None)
-
-    # A constructor which takes in a pre-made serial device
-    @classmethod
-    def from_serial_device(cls, dev):
-        return cls(dev)
-
-    @classmethod
-    def guided_setup(cls):
-        print("The dummy device requires no guided setup")
-        # print("Let's still fake the serial port selection")
-
-        # ports = list(serial.tools.list_ports.comports())
-        # if len(ports) == 0:
-        #     raise ValueError("No serial ports available")
-        # print("Available serial ports:")
-        # for i, port in enumerate(ports, start=1):
-        #     print(f"{i}. {port.device}")
-        # while True:
-        #     try:
-        #         choice = int(input("Enter the number of the serial port you want to use: "))
-        #         if choice < 1 or choice > len(ports):
-        #             print("Invalid choice. Please enter a valid port number.")
-        #         else:
-        #             break
-        #     except ValueError:
-        #         print("Invalid input. Please enter a number.")
-=======
-        ports = list(serial.tools.list_ports.comports())
-        if len(ports) == 0:
-            raise ValueError("No serial ports available")
-        print("Available serial ports:")
-        for i, port in enumerate(ports, start=1):
-            print(f"{i}. {port.device}")
-        while True:
-            try:
-                choice = int(
-                    input("Enter the number of the serial port you want to use: ")
-                )
-                if choice < 1 or choice > len(ports):
-                    print("Invalid choice. Please enter a valid port number.")
-                else:
-                    break
-            except ValueError:
-                print("Invalid input. Please enter a number.")
->>>>>>> e8bd1cb87bb901ccd56cc0dda1b2041e882d76bb
-        return cls(None)
-
-    # No longer allow intensity, pulse width to be None
-    # This is because calibration data is not stored in this object
-    # but is stored in the handler object
-    # so it doesn't make sense to fall back on it here - the fall back
-    # should occur upstream
-    def stimulate(
-        self, channel: int, intensity: int, pulse_width: int, pulse_count: int
-    ):
-        print("I'm stimulating!")
-        print(
-            "Dummy Device: Stimulating channel %d with intensity %d, pulse width %d, pulse count %d"
-            % (channel, intensity, pulse_width, pulse_count)
-        )
+#
+# class Dummy(Device):
+#     name: str = "Dummy Device"
+#     pulse_count: int = 5
+#     intensity_min: int = 0
+#     intensity_max: int = 32
+#     intensity_step: int = 1
+#     pulse_width_min: int = 200
+#     pulse_width_max: int = 450
+#     pulse_width_step: int = 1
+#     n_channels: int = 8
+#
+#     def __repr__(self):
+#         # used to display device-specific information (name, make, model, battery, etc.)
+#         print("I'm a dummy device")
+#         pass
+#
+#     @classmethod
+#     def from_port(cls, port, **kwargs):
+#         return cls(None)
+#
+#     # A constructor which takes in a pre-made serial device
+#     @classmethod
+#     def from_serial_device(cls, dev):
+#         return cls(dev)
+#
+#     @classmethod
+#     def guided_setup(cls):
+#         print("The dummy device requires no guided setup")
+#         # print("Let's still fake the serial port selection")
+#
+#         # ports = list(serial.tools.list_ports.comports())
+#         # if len(ports) == 0:
+#         #     raise ValueError("No serial ports available")
+#         # print("Available serial ports:")
+#         # for i, port in enumerate(ports, start=1):
+#         #     print(f"{i}. {port.device}")
+#         # while True:
+#         #     try:
+#         #         choice = int(input("Enter the number of the serial port you want to use: "))
+#         #         if choice < 1 or choice > len(ports):
+#         #             print("Invalid choice. Please enter a valid port number.")
+#         #         else:
+#         #             break
+#         #     except ValueError:
+#         #         print("Invalid input. Please enter a number.")
+# =======
+#         ports = list(serial.tools.list_ports.comports())
+#         if len(ports) == 0:
+#             raise ValueError("No serial ports available")
+#         print("Available serial ports:")
+#         for i, port in enumerate(ports, start=1):
+#             print(f"{i}. {port.device}")
+#         while True:
+#             try:
+#                 choice = int(
+#                     input("Enter the number of the serial port you want to use: ")
+#                 )
+#                 if choice < 1 or choice > len(ports):
+#                     print("Invalid choice. Please enter a valid port number.")
+#                 else:
+#                     break
+#             except ValueError:
+#                 print("Invalid input. Please enter a number.")
+# >>>>>>> e8bd1cb87bb901ccd56cc0dda1b2041e882d76bb
+#         return cls(None)
+#
+#     # No longer allow intensity, pulse width to be None
+#     # This is because calibration data is not stored in this object
+#     # but is stored in the handler object
+#     # so it doesn't make sense to fall back on it here - the fall back
+#     # should occur upstream
+#     def stimulate(
+#         self, channel: int, intensity: int, pulse_width: int, pulse_count: int
+#     ):
+#         print("I'm stimulating!")
+#         print(
+#             "Dummy Device: Stimulating channel %d with intensity %d, pulse width %d, pulse count %d"
+#             % (channel, intensity, pulse_width, pulse_count)
+#         )
