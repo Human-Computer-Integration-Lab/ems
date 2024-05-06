@@ -75,12 +75,12 @@ class Rehastim(Device):
                 self.device.write(self._generate_pulse(channel, pulse_width, intensity))
                 time.sleep(self.delay)
 
-        self._runInThread(stimInThread)
+        self._run_in_thread(stimInThread)
 
     def _stimulate_in_thread(self, channel, intensity, pulse_width, pulse_count):
         for _ in range(pulse_count):
             self.device.write(self._generate_pulse(channel, pulse_width, intensity))
-            time.sleep(self.delay)
+            time.sleep(0.01)
 
     def _decode_response(self):
         """Decodes responses received over the serial port"""
