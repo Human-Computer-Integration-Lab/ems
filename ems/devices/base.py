@@ -68,25 +68,3 @@ class ChannelConfiguration:
             raise ValueError(
                 f"Invalid value for channel: {channel}. Device supports up to {self.n_channels} channels"
             )
-
-
-# TODO: Delete before pushing to main, used for demo during meeting
-
-
-class DeviceA(Device):
-    """Basic device with no configuration (i.e. only constructors and stimulate function)"""
-
-    pass
-
-
-class DeviceB(Device, IntensityConfiguration):
-    """Device that only allows for intensity to be configured"""
-
-    pass
-
-
-class DeviceC(Device, IntensityConfiguration, ChannelConfiguration):
-    """Device that allows for intensity to be configured, with support
-    for multiple channels."""
-
-    pass
