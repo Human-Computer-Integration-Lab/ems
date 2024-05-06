@@ -11,7 +11,7 @@ class Rehastim(Device):
 
     intensity_min = 0
     intensity_max = 126
-    intensity_step = 2
+    intensity_step = 1
 
     pulse_width_min = 20
     pulse_width_max = 500
@@ -75,9 +75,9 @@ class Rehastim(Device):
                 # Generate a single pulse
                 # pulse = [self.calibration[channel][0], self.calibration[channel][1], int(self.calibration[channel][2])] # ch, pw, mA
                 self.device.write(self._generate_pulse(channel, pulse_width, intensity))
-                time.sleep(self.delay)
+                time.sleep(0.01)
 
-        self._runInThread(stimInThread)
+        self._run_in_thread(stimInThread)
 
     def _stimulate_in_thread(self, channel, intensity, pulse_width, pulse_count):
         for _ in range(pulse_count):

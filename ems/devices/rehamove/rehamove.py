@@ -1,6 +1,5 @@
 from . import rehamovelib
 
-
 class Rehamove:
     current_version = "v1.6"
 
