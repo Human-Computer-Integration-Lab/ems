@@ -76,7 +76,7 @@ class Rehamove:
         return chosen_channel
 
     def pulse(self, channel, current, pulse_width):
-        if self.rehamove:
+        if self.rehamove == None:
             print("python Rehamove pulse() ERROR! Rehamove object does not exist.")
             return -1
         chosen_channel = self.get_channel(channel)
