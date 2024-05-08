@@ -1,7 +1,7 @@
 from ..base import Device
 import serial.tools.list_ports
 from . import rehamove
-
+import time
 
 class Rehamove(Device):
     name: str = "rehamove"
@@ -48,10 +48,12 @@ class Rehamove(Device):
         intensity: int,
         pulse_width: int,
         pulse_count: int,
-        validate_params: bool = True,
+        delay: int = .01,
+        validate_params: bool = False,
     ):
         print("test")
         if validate_params:
             self.validate(channel, intensity, pulse_width)
         for _ in range(pulse_count):
             _p = self.device.pulse(channel, intensity, pulse_width)
+            time.sleep(delay)

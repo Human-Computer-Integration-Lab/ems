@@ -235,9 +235,8 @@ class EMS:
         """
         self._check_channel_calibration(channel, intensity, pulse_width)
 
-        for _ in range(pulse_count):
-            self.stimulate(channel, intensity, pulse_width)
-            time.sleep(delay)
+        self.device.stimulate(channel=channel, intensity=intensity, pulse_width=pulse_width, pulse_count=pulse_count, delay=delay)
+        # time.sleep(delay)
 
     def timed_stimulate(self):
         raise NotImplementedError

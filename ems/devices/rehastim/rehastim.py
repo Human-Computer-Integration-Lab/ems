@@ -62,7 +62,8 @@ class Rehastim(Device):
         intensity: int,
         pulse_width: int,
         pulse_count: int,
-        validate_params: bool = True,
+        delay: int = .05,
+        validate_params: bool = False,
     ):
         if validate_params:
             self.validate(channel, intensity, pulse_width)
@@ -75,7 +76,7 @@ class Rehastim(Device):
                 # Generate a single pulse
                 # pulse = [self.calibration[channel][0], self.calibration[channel][1], int(self.calibration[channel][2])] # ch, pw, mA
                 self.device.write(self._generate_pulse(channel, pulse_width, intensity))
-                time.sleep(self.delay)
+                time.sleep(delay)
 
         self._runInThread(stimInThread)
 
