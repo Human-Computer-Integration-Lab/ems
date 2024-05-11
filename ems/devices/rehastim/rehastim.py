@@ -11,7 +11,7 @@ class Rehastim(Device):
 
     intensity_min = 0
     intensity_max = 126
-    intensity_step = 2
+    intensity_step = 1
 
     pulse_width_min = 20
     pulse_width_max = 500
