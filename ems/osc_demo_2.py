@@ -3,8 +3,9 @@ from devices import Dummy
 # my_device = EMS(Dummy(None))
 # my_device.listen(5005)
 
-x = Dummy(None)
+x = Dummy.from_osc("127.0.0.1", 5005)
 
-x.listen(5005)
+x.stimulate(0, 300, 20, 5)
 
-x.stimulate(0, 300, 20, 6)
+x.battery()
+
