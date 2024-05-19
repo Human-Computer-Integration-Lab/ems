@@ -2,6 +2,10 @@ from pythonosc import dispatcher, osc_server
 from pythonosc.osc_message_builder import OscMessageBuilder
 from pythonosc.udp_client import SimpleUDPClient
 import threading
+
+
+import socket
+import pickle
 class Device:
     name: str = None
 
@@ -21,8 +25,15 @@ class Device:
     # Used to determine how this "device" will forward on commands 
     # to a remote device. 
 
-    intercept: bool = False
-    client = None
+    intercept_osc: bool = False
+    client_osc = None
+
+    # Socket Configuration
+    host = None
+    port = None
+    client_socket = None  # Used on the remote device (the device with the EMS attached)
+
+
 
     def __init__(self, device):
         self.device = device
@@ -31,13 +42,27 @@ class Device:
         print("Getattribute called with name: ", name)
         try:
             attr = super().__getattribute__(name)
-            if not super().__getattribute__('intercept'):
+            if not (super().__getattribute__('intercept_osc') or super().__getattribute__('host')):
                 return attr
-            if callable(attr):
-                def method(*args):
-                    # Use super() to access _send_osc_message to avoid recursion
-                    super(Device, self).__getattribute__('_send_osc_message')(name, *args)
-                return method
+            if super().__getattribute__('intercept_osc'):
+                if callable(attr):
+                    def method(*args):
+                        # Use super() to access _send_osc_message to avoid recursion
+                        super(Device, self).__getattribute__('_send_osc_message')(name, *args)
+                    return method
+                return attr
+            else:
+                if callable(attr):
+                    def method(*args, **kwargs):
+                        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        client_socket.connect((self.host, self.port))
+                        request = pickle.dumps((name, args, kwargs))
+                        client_socket.send(request)
+                        response = client_socket.recv(1024)
+                        result = pickle.loads(response)
+                        client_socket.close()
+                        return result
+                    return method
             return attr
         except AttributeError:
             # If the attribute does not exist, it will be handled in __getattr__
@@ -68,17 +93,44 @@ class Device:
     @classmethod 
     def from_osc(cls, ip_address, port):
         x = cls(None)
-        x.intercept = True
-        x.client = SimpleUDPClient(ip_address, port)
+        x.intercept_osc = True
+        x.client_osc = SimpleUDPClient(ip_address, port)
         return x
     
+    @classmethod 
+    def from_socket(cls, ip_address, port):
+        x = cls(None)
+        x.host = ip_address
+        x.port = port
+        return x
+
+    def handle_client(self, client_socket):
+        request = client_socket.recv(1024)
+        method_name, args, kwargs = pickle.loads(request)
+        print(f"Received request for method: {method_name} with args: {args} and kwargs: {kwargs}")
+        result = super().__getattribute__(method_name)(*args, **kwargs)
+        response = pickle.dumps(result)
+        client_socket.send(response)
+        client_socket.close()
+
+    def listen_socket(self, host, port):
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket.bind((host, port))
+        self.client_socket.listen(5)
+        print("Server is running...")
+        while True:
+            client_socket, addr = self.client_socket.accept()
+            print(f"Accepted connection from {addr}")
+            self.handle_client(client_socket)
+
+
     def _send_osc_message(self, method_name, *args):
 
         msg = OscMessageBuilder(address=f"/{method_name}")
         for arg in args:
             msg.add_arg(arg)
         msg = msg.build()
-        self.client.send(msg)
+        self.client_osc.send(msg)
 
     def stimulate(self, *args, **kwargs):
         raise NotImplementedError
@@ -123,7 +175,7 @@ class Device:
             )
         
 
-    def listen(self, port):
+    def listen_osc(self, port):
         osc_dispatcher = dispatcher.Dispatcher()
         osc_dispatcher.set_default_handler(self.osc_handler)
         server_thread = threading.Thread(target=self.start_osc_server, args=(port, osc_dispatcher))
@@ -140,3 +192,5 @@ class Device:
         server = osc_server.ThreadingOSCUDPServer(("127.0.0.1", port), osc_dispatcher)
         print("OSC Server listening on port", port)
         server.serve_forever()
+
+
