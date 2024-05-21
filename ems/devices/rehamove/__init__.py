@@ -1,3 +1,3 @@
-from .rehamove_device import Rehamove
-
+from .rehamove import Rehamove
+from .rehamove_serial import RehamoveSerial
 __all__ = ["Rehamove"]

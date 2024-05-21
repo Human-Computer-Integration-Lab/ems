@@ -187,6 +187,7 @@ class EMS:
         channel: int,
         intensity: int = None,
         pulse_width: int = None,
+        pulse_count: int = None,
     ):
         """Stimulates a single pulse.
 
@@ -205,9 +206,10 @@ class EMS:
             intensity = self.calibration[channel].intensity
         if pulse_width is None:
             pulse_width = self.calibration[channel].pulse_width
-
+        if pulse_count is None:
+            pulse_count = 1
         self.device.stimulate(
-            channel=channel, intensity=intensity, pulse_width=pulse_width, pulse_count=1
+            channel=channel, intensity=intensity, pulse_width=pulse_width, pulse_count=pulse_count
         )
 
     def pulsed_stimulate(

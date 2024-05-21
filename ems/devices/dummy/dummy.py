@@ -15,6 +15,8 @@ class Dummy(Device):
     pulse_width_step: int = 1
     n_channels: int = 8
 
+    secrete = None
+
     def __repr__(self):
         # used to display device-specific information (name, make, model, battery, etc.)
         print("I'm a dummy device")
@@ -64,3 +66,16 @@ class Dummy(Device):
             "Dummy Device: Stimulating channel %d with intensity %d, pulse width %d, pulse count %d"
             % (channel, intensity, pulse_width, pulse_count)
         )
+
+
+    def battery(self):
+        return 100
+    
+    def getSecret(self):
+        return self.secret
+    
+    def setSecret(self, val):
+        self.secret = val
+
+    def exceptionalFunction(self):
+        raise ValueError

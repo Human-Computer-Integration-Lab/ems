@@ -1,9 +1,9 @@
 from .rehastim import Rehastim
-from .rehamove import Rehamove
+from .rehamove import RehamoveSerial
 from .base import Device
 from .dummy import Dummy
 
-supported_devices = {"rehastim": Rehastim, "rehamove": Rehamove, "dummy": Dummy}
+supported_devices = {"rehastim": Rehastim, "rehamove": RehamoveSerial, "dummy": Dummy}
 
 __all__ = [
     "Device",

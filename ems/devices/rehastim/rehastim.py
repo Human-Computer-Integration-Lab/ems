@@ -33,6 +33,8 @@ class Rehastim(Device):
             timeout=0,
         )
         return cls(serial_device)
+    
+
 
     @classmethod
     def guided_setup(cls):
@@ -78,7 +80,7 @@ class Rehastim(Device):
                 self.device.write(self._generate_pulse(channel, pulse_width, intensity))
                 time.sleep(delay)
 
-        self._runInThread(stimInThread)
+        self._run_in_thread(stimInThread)
 
     def _stimulate_in_thread(self, channel, intensity, pulse_width, pulse_count):
         for _ in range(pulse_count):

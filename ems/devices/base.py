@@ -39,7 +39,7 @@ class Device:
         self.device = device
 
     def __getattribute__(self, name):
-        print("Getattribute called with name: ", name)
+        # print("Getattribute called with name: ", name)
         try:
             attr = super().__getattribute__(name)
             if not (super().__getattribute__('intercept_osc') or super().__getattribute__('host')):
