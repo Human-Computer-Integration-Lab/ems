@@ -6,3 +6,4 @@ dependencies:
     - sphinx
     - pydata-sphinx-theme
     - sphinx-design
+    - ipywidgets
