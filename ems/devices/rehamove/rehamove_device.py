@@ -1,9 +1,9 @@
-from ..base import Device
+from ..base import Device, IntensityConfiguration, PulseWidthConfiguration, ChannelConfiguration
 import serial.tools.list_ports
 from . import rehamove
 import time
 
-class Rehamove(Device):
+class Rehamove(Device, IntensityConfiguration, PulseWidthConfiguration, ChannelConfiguration):
     name: str = "rehamove"
     intensity_min = 0
     intensity_max = 150

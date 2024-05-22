@@ -1,9 +1,16 @@
 import pytest
 
-from ems.devices import Device
+from ems.devices import (
+    Device,
+    IntensityConfiguration,
+    PulseWidthConfiguration,
+    ChannelConfiguration,
+)
 
 
-class TestDevice(Device):
+class TestDevice(
+    Device, IntensityConfiguration, PulseWidthConfiguration, ChannelConfiguration
+):
     name = "Test Device"
 
     intensity_min = 0
@@ -23,7 +30,7 @@ class TestDevice(Device):
 
     def stimulate(self, channel, intensity, pulse_width, validate_params=True):
         if validate_params:
-            self.validate(channel, intensity, pulse_width)
+            self.validate(channel=channel, intensity=intensity, pulse_width=pulse_width)
         return True
 
 

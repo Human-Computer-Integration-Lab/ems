@@ -1,6 +1,7 @@
-from . import rehamovelib
+# from . import rehamovelib
 
 class Rehamove:
+
 
 	current_version = "v1.5"
 
@@ -10,6 +11,7 @@ class Rehamove:
 	channel3 = ['g2', 'gray2', 'grey2', 'white']
 
 	def __init__(self, port_name):
+		from . import rehamovelib
 		self.rehamove = rehamovelib.open_port(port_name)
 
 	def version(self):

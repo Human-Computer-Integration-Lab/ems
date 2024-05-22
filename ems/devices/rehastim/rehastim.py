@@ -1,4 +1,4 @@
-from ..base import Device
+from ..base import Device, IntensityConfiguration, PulseWidthConfiguration, ChannelConfiguration
 
 import serial
 import time
@@ -6,7 +6,7 @@ import threading
 import binascii
 
 
-class Rehastim(Device):
+class Rehastim(Device, IntensityConfiguration, PulseWidthConfiguration, ChannelConfiguration):
     name: str = "rehastim"
 
     intensity_min = 0
@@ -57,13 +57,13 @@ class Rehastim(Device):
         return cls.from_port(ports[choice - 1].device)
 
     def stimulate(
-        self,
-        channel: int,
-        intensity: int,
-        pulse_width: int,
-        pulse_count: int,
-        delay: int = .05,
-        validate_params: bool = False,
+            self,
+            channel: int,
+            intensity: int,
+            pulse_width: int,
+            pulse_count: int,
+            delay: int = .05,
+            validate_params: bool = False,
     ):
         if validate_params:
             self.validate(channel, intensity, pulse_width)
@@ -97,23 +97,23 @@ class Rehastim(Device):
                 print(bitstring_v)
 
     def _generate_pulse(
-        self, channel_number: int, pulse_width: int, pulse_current: int
+            self, channel_number: int, pulse_width: int, pulse_current: int
     ):
         ident = 3
         checksum = (channel_number + pulse_width + pulse_current) % 32
 
         get_bin = (
             lambda x, n: x >= 0
-            and str(bin(x))[2:].zfill(n)
-            or "-" + str(bin(x))[3:].zfill(n)
+                         and str(bin(x))[2:].zfill(n)
+                         or "-" + str(bin(x))[3:].zfill(n)
         )
 
         binarized_cmd = (
-            get_bin(ident, 2)
-            + get_bin(checksum, 5)
-            + get_bin(channel_number, 3)
-            + get_bin(pulse_width, 9)
-            + get_bin(pulse_current, 7)
+                get_bin(ident, 2)
+                + get_bin(checksum, 5)
+                + get_bin(channel_number, 3)
+                + get_bin(pulse_width, 9)
+                + get_bin(pulse_current, 7)
         )
         cmd_pointer = 0
         new_cmd_pointer = 0
@@ -123,9 +123,9 @@ class Rehastim(Device):
             if new_cmd_pointer == 0:  # add a 1
                 proper_cmd[new_cmd_pointer] = "1"
             elif (
-                new_cmd_pointer == (9 - 1)
-                or new_cmd_pointer == (17 - 1)
-                or new_cmd_pointer == (25 - 1)
+                    new_cmd_pointer == (9 - 1)
+                    or new_cmd_pointer == (17 - 1)
+                    or new_cmd_pointer == (25 - 1)
             ):  # add a 0
                 proper_cmd[new_cmd_pointer] = "0"
             elif new_cmd_pointer == (13 - 1) or new_cmd_pointer == (14 - 1):  # add a X

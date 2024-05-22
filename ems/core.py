@@ -1,5 +1,5 @@
-from devices import Device, supported_devices
-from calibration import CalibrationWidget
+from ems.devices import Device, supported_devices
+from .calibration import CalibrationWidget
 import json
 import time
 from IPython.display import display
@@ -7,7 +7,6 @@ import threading
 from pythonosc import osc_server, dispatcher
 
 
-# from pythonosc.dispatcher import Dispatcher
 class EMS:
     """A device-agnostic interface for performing Electrical Muscle Stimulation.
 
@@ -305,7 +304,9 @@ class Channel:
         self._device = device
 
         # validate channel specifications to ensure they adhere to the device specifications
-        self._device.validate(identifier, intensity, pulse_width)
+        self._device.validate(
+            channel=identifier, intensity=intensity, pulse_width=pulse_width
+        )
 
         self._identifier = identifier
         self._intensity = intensity
