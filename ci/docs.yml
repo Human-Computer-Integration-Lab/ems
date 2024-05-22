@@ -7,6 +7,8 @@ dependencies:
     - pydata-sphinx-theme
     - sphinx-design
     - ipywidgets
+    - nbsphinx
+    - myst-nb
     - pip
     - pip:
       - python-osc
