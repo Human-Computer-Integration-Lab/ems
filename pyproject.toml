@@ -36,7 +36,7 @@ find = {}
 fallback_version = "9999"
 
 [tool.ruff.lint]
-ignore = ['E731']
+ignore = ['E731', 'F401']
 
 [tool.ruff]
 extend-exclude = ["ems/devices/rehamove","ems/devices/rehastim", "ems/devices/dummy"]
