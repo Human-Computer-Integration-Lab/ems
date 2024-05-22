@@ -7,3 +7,4 @@ dependencies:
     - pydata-sphinx-theme
     - sphinx-design
     - ipywidgets
+    - pythonosc
