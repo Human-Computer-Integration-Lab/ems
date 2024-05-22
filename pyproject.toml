@@ -37,3 +37,7 @@ fallback_version = "9999"
 
 [tool.ruff.lint]
 ignore = ['E731']
+
+[tool.ruff]
+extend-exclude = ["ems/devices/rehamove","ems/devices/rehastim", "ems/devices/dummy"]
+
