@@ -41,7 +41,7 @@ EMS is an open-source Python package for device agnostic electrical muscle stimu
 
         +++
 
-        .. button-ref:: user-guide/index
+        .. button-ref:: user-guide
             :expand:
             :color: secondary
             :click-parent:

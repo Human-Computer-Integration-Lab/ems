@@ -24,6 +24,8 @@ extensions = [
     "sphinx_design",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
+    "nbsphinx",
+    "myst_nb",
 ]
 
 autosummary_generate = True
