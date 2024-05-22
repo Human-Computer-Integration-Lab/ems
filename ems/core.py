@@ -127,7 +127,7 @@ class EMS:
             #     #channel number (1-8), pulse width (200-450) in microseconds, intensity (0-100mA, limited 32mA)
             #     time.sleep(0.01)
 
-    def visual_calibrate(
+    def calibrate_widget(
         self,
     ):
         """Calibration utility."""
