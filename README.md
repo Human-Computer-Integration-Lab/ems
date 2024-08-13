@@ -10,3 +10,6 @@ https://pypi.org/project/ems/)
 https://anaconda.org/conda-forge/numpy)
 
 EMS is an open-source toolkit for Electrical Muscle Stimulation.
+
+## Errors
+If you receive an error similar to `_rehamovelib.so' (mach-o file, but is an incompatible architecture (have 'x86_64', need 'arm64'))`, you can use conda to create a virtual environment with osx-64 environment (thanks Alicia Chun for catching this, and see this [Stack Overflow post for how to do it](https://stackoverflow.com/questions/71515117/how-to-set-up-a-conda-osx-64-environment-on-arm-mac)).
